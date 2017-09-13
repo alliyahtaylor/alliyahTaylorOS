@@ -13,7 +13,7 @@
 // TODO: Write a base class / prototype for system services and let Shell inherit from it.
 var TSOS;
 (function (TSOS) {
-    var Shell = (function () {
+    var Shell = /** @class */ (function () {
         function Shell() {
             // Properties
             this.promptStr = ">";
@@ -48,6 +48,10 @@ var TSOS;
             this.commandList[this.commandList.length] = sc;
             // prompt <string>
             sc = new TSOS.ShellCommand(this.shellPrompt, "prompt", "<string> - Sets the prompt.");
+            this.commandList[this.commandList.length] = sc;
+            sc = new TSOS.ShellCommand(this.shellDate, "date", "- Shows the current date.");
+            this.commandList[this.commandList.length] = sc;
+            sc = new TSOS.ShellCommand(this.shellWhere, "whereami", "- Shows the user's current location.");
             this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
@@ -246,7 +250,17 @@ var TSOS;
                 _StdOut.putText("Usage: prompt <string>  Please supply a string.");
             }
         };
+        Shell.prototype.shellDate = function (args) {
+            _StdOut.putText("The current stardate is " + Date().toLocaleString() + ".");
+            //Okay, so not quite a stardate yet.
+            //TODO Pick a style of stardate and express it via ts.
+        };
+        Shell.prototype.shellWhere = function (args) {
+            var locations = ['Farpoint Station', 'The Neutral Zone', 'Ceti Alpha V', 'Starfleet Academy', 'Rubicun III', 'Vulcan', 'Omicron Ceti III', 'Main Engineering aboard the USS Enterprise', 'The lifeless void of space. How sad', 'Risa'];
+            var place = locations[Math.floor(Math.random() * locations.length)];
+            _StdOut.putText("You are current located at " + place + ".");
+        };
         return Shell;
-    })();
+    }());
     TSOS.Shell = Shell;
 })(TSOS || (TSOS = {}));
