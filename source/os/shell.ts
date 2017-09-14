@@ -246,7 +246,33 @@ module TSOS {
                     case "help":
                         _StdOut.putText("Help displays a list of (hopefully) valid commands.");
                         break;
-                    // TODO: Make descriptive MANual page entries for the the rest of the shell commands here.
+                    case "ver":
+                        _StdOut.putText("Ver displays the current version data for the Operating System.");
+                        break;
+                    case "shutdown":
+                        _StdOut.putText("Shutdown ends OS simulation. But you wouldn't do that, would you?");
+                        break;
+                    case "cls":
+                        _StdOut.putText("Cls clears the screen and returns cursor to top of canvas.");
+                        break;
+                    case "trace":
+                        _StdOut.putText("Trace turns OS trace on or off. User must indicate on or off status");
+                        break;
+                    case "man":
+                        _StdOut.putText("Man displays manual page for topic. USer must include topic. How did you even get here?");
+                        break;
+                    case "rot13":
+                        _StdOut.putText("Rot13 does rot13 encoding on given text. For when Alan wants to curse in his code.");
+                        break;
+                    case "prompt":
+                        _StdOut.putText("Prompt changes the CLI prompt. Must provide a string.");
+                        break;
+                    case "date":
+                        _StdOut.putText("Date shows the current (star)date.");
+                        break;
+                    case "whereami":
+                        _StdOut.putText("Whereami shows the user's approximate location.");
+                        break;
                     default:
                         _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
@@ -303,7 +329,9 @@ module TSOS {
         public shellWhere(args) {
             var locations = ['Farpoint Station', 'The Neutral Zone', 'Ceti Alpha V', 'Starfleet Academy','Rubicun III','Vulcan','Omicron Ceti III','Main Engineering aboard the USS Enterprise','The lifeless void of space. How sad','Risa' ];
             var place = locations[Math.floor(Math.random() * locations.length)];
+                //Picking a "random" place to show the user each time.
             _StdOut.putText("You are current located at " + place + ".");
         }
+
     }
 }
