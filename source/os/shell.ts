@@ -87,6 +87,10 @@ module TSOS {
                                   "whereami",
                                   "- Shows the user's current location.");
             this.commandList[this.commandList.length] = sc;
+            sc = new ShellCommand(this.shellPower,
+                "morepower",
+                "- Transfers more power to the engines.");
+            this.commandList[this.commandList.length] = sc;
 
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
@@ -331,6 +335,10 @@ module TSOS {
             var place = locations[Math.floor(Math.random() * locations.length)];
                 //Picking a "random" place to show the user each time.
             _StdOut.putText("You are current located at " + place + ".");
+        }
+        public shellPower(args) {
+            _StdOut.putText("I'm givin' her all she's got, captain!!");
+                //I know this line was never exactly said in TOS, please don't take my Trekkie cred.
         }
 
     }
