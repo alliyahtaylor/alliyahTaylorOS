@@ -57,6 +57,8 @@ var TSOS;
             this.commandList[this.commandList.length] = sc;
             sc = new TSOS.ShellCommand(this.shellStatus, "status", "<string> - Sets the status.");
             this.commandList[this.commandList.length] = sc;
+            sc = new TSOS.ShellCommand(this.shellBSOD, "error", "- A test error.");
+            this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
             //
@@ -304,6 +306,9 @@ var TSOS;
                 _StdOut.putText("Usage: prompt <string>  Please supply a string.");
             }
             TSOS.Control.dateTimeStatusUpdate();
+        };
+        Shell.prototype.shellBSOD = function (args) {
+            _Kernel.krnTrapError("Test Error, Yellow Alert.");
         };
         return Shell;
     }());

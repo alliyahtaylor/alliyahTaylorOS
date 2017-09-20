@@ -95,6 +95,10 @@ module TSOS {
                 "status",
                 "<string> - Sets the status.");
             this.commandList[this.commandList.length] = sc;
+            sc = new ShellCommand(this.shellBSOD,
+                "error",
+                "- A test error.");
+            this.commandList[this.commandList.length] = sc;
 
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
@@ -352,6 +356,9 @@ module TSOS {
                 _StdOut.putText("Usage: prompt <string>  Please supply a string.");
             }
             TSOS.Control.dateTimeStatusUpdate();
+        }
+        public shellBSOD(args){
+            _Kernel.krnTrapError("Test Error, Yellow Alert.");
         }
 
     }
