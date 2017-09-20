@@ -84,8 +84,24 @@ module TSOS {
             this.currentYPosition += _DefaultFontSize + 
                                      _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) +
                                      _FontHeightMargin;
-
-            // TODO: Handle scrolling. (iProject 1)
+            //I broke this somehow. Keeping in to figure out what happened here.
+            /*if (this.currentYPosition > _Canvas.height){
+                var scrollBuffer = _DrawingContext.getImageData (0, 0, _Canvas.width, _Canvas.height);
+                this.clearScreen();
+                _DrawingContext.putImageData(scrollBuffer, 0,0);
+            }; */
+            if (this.currentYPosition > _Canvas.height){
+                //A variable that equals the size of one line, used to delete a line and leave space at the bottom.
+                var oneLine = _FontHeightMargin + _DefaultFontSize;
+                //considering subbing out 500 and 500 for _Canvas width and height in case I change things with CSS.
+                //Takes a snapshot of what is currently drawn on the canvas.
+              var scrollBuffer = _DrawingContext.getImageData(0, oneLine, 500, 500);
+                //Clears the canvas.
+              this.clearScreen();
+                //Pastes the buffer image.
+              _DrawingContext.putImageData(scrollBuffer, 0,0)
+                this.currentYPosition = _Canvas.height - oneLine;
+            };
         }
     }
  }

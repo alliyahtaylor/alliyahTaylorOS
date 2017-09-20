@@ -55,6 +55,8 @@ var TSOS;
             this.commandList[this.commandList.length] = sc;
             sc = new TSOS.ShellCommand(this.shellPower, "morepower", "- Transfers more power to the engines.");
             this.commandList[this.commandList.length] = sc;
+            sc = new TSOS.ShellCommand(this.shellStatus, "status", "<string> - Sets the status.");
+            this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
             //
@@ -292,6 +294,16 @@ var TSOS;
         Shell.prototype.shellPower = function (args) {
             _StdOut.putText("I'm givin' her all she's got, captain!!");
             //I know this line was never exactly said in TOS, please don't take my Trekkie cred.
+        };
+        Shell.prototype.shellStatus = function (status) {
+            if (status.length > 0) {
+                //set global var _Status equal to user input
+                _Status += status;
+            }
+            else {
+                _StdOut.putText("Usage: prompt <string>  Please supply a string.");
+            }
+            TSOS.Control.dateTimeStatusUpdate();
         };
         return Shell;
     }());

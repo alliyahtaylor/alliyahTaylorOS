@@ -55,6 +55,8 @@ module TSOS {
                 _GLaDOS = new Glados();
                 _GLaDOS.init();
             }
+            //Update Earth Time on the host
+            this.dateTimeStatusUpdate();
         }
 
         public static hostLog(msg: string, source: string = "?"): void {
@@ -70,7 +72,8 @@ module TSOS {
             // Update the log console.
             var taLog = <HTMLInputElement> document.getElementById("taHostLog");
             taLog.value = str + taLog.value;
-
+            //Update Date and Status
+            Control.dateTimeStatusUpdate();
             // TODO in the future: Optionally update a log database or some streaming service.
         }
 
@@ -116,6 +119,17 @@ module TSOS {
             // That boolean parameter is the 'forceget' flag. When it is true it causes the page to always
             // be reloaded from the server. If it is false or not specified the browser may reload the
             // page from its cache, which is not what we want.
+        }
+        public static dateTimeStatusUpdate(){
+            //Create new date variable
+            var earthTime = new Date();
+            //Establishing date format so that it isn't ugly.
+            var options ={
+                hour: "2-digit", minute: "2-digit"
+            };
+            //Change the earthTime label to display the current date.
+            document.getElementById("earthTimeLabel").innerHTML = "Earth Time: " + earthTime.toLocaleDateString("en-US", options);
+            document.getElementById("statusLabel").innerHTML = "Current Status:" + _Status;
         }
     }
 }
