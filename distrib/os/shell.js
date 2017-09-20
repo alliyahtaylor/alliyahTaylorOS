@@ -59,6 +59,8 @@ var TSOS;
             this.commandList[this.commandList.length] = sc;
             sc = new TSOS.ShellCommand(this.shellBSOD, "error", "- A test error.");
             this.commandList[this.commandList.length] = sc;
+            sc = new TSOS.ShellCommand(this.shellLoad, "load", "- Validates the user code.");
+            this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
             //
@@ -303,13 +305,24 @@ var TSOS;
                 _Status += status;
             }
             else {
-                _StdOut.putText("Usage: prompt <string>  Please supply a string.");
+                _StdOut.putText("Usage: status <string>  Please supply a string.");
             }
             TSOS.Control.dateTimeStatusUpdate();
         };
         Shell.prototype.shellBSOD = function (args) {
             _Kernel.krnTrapError("Test Error, Yellow Alert.");
         };
+        Shell.prototype.shellLoad = function (args) {
+            var userProg = document.getElementById("taProgramInput").value;
+            var hexTest = new RegExp(/^[A-Fa-f0-9\s]+$/);
+            if (userProg.match(hexTest)) {
+                _StdOut.putText("Successful Load.");
+            }
+            else {
+                _StdOut.putText("Invalid program, non-hex digits.");
+            }
+        };
+        ;
         return Shell;
     }());
     TSOS.Shell = Shell;

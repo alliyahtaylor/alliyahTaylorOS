@@ -83,21 +83,30 @@ module TSOS {
                                   "date",
                                   "- Shows the current date.");
             this.commandList[this.commandList.length] = sc;
+
             sc = new ShellCommand(this.shellWhere,
                                   "whereami",
                                   "- Shows the user's current location.");
             this.commandList[this.commandList.length] = sc;
+
             sc = new ShellCommand(this.shellPower,
                 "morepower",
                 "- Transfers more power to the engines.");
             this.commandList[this.commandList.length] = sc;
+
             sc = new ShellCommand(this.shellStatus,
                 "status",
                 "<string> - Sets the status.");
             this.commandList[this.commandList.length] = sc;
+
             sc = new ShellCommand(this.shellBSOD,
                 "error",
                 "- A test error.");
+            this.commandList[this.commandList.length] = sc;
+
+            sc = new ShellCommand (this.shellLoad,
+                "load",
+                "- Validates the user code." );
             this.commandList[this.commandList.length] = sc;
 
             // ps  - list the running processes and their IDs
@@ -353,13 +362,29 @@ module TSOS {
                 //set global var _Status equal to user input
                 _Status += status;
             } else {
-                _StdOut.putText("Usage: prompt <string>  Please supply a string.");
+                _StdOut.putText("Usage: status <string>  Please supply a string.");
             }
             TSOS.Control.dateTimeStatusUpdate();
         }
+
+        //Sends a test error to activate the BSOD
         public shellBSOD(args){
             _Kernel.krnTrapError("Test Error, Yellow Alert.");
         }
+
+        public shellLoad(args){
+            //Get the user input from the user program box
+            var userProg = (<HTMLInputElement>document.getElementById("taProgramInput")).value;
+            //set up a regular expression to test the user input against
+            var hexTest = new RegExp(/^[A-Fa-f0-9\s]+$/);
+            //see if user input matches the regular expression
+            if (userProg.match(hexTest)){
+                _StdOut.putText("Successful Load.");
+            }
+            else{
+                _StdOut.putText("Invalid program, non-hex digits.");
+            }
+        };
 
     }
 }
