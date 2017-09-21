@@ -17,7 +17,9 @@ module TSOS {
                     public currentFontSize = _DefaultFontSize,
                     public currentXPosition = 0,
                     public currentYPosition = _DefaultFontSize,
-                    public buffer = "") {
+                    public buffer = "",
+                    public recallBuffer= "" //for recalling old input
+         ) {
         }
 
         public init(): void {
@@ -43,10 +45,24 @@ module TSOS {
                     // The enter key marks the end of a console command, so ...
                     // ... tell the shell ...
                     _OsShell.handleInput(this.buffer);
+                    //Keep buffer when user presses enter.
+                    this.recallBuffer = this.buffer;
                     // ... and reset our buffer.
                     this.buffer = "";
                 } else if( chr === String.fromCharCode(8)) { //Backspace Key
                     this.backspace(this.buffer.charAt(this.buffer.length-1));
+                }
+                else if( chr == String.fromCharCode(9) ) // Up arrow
+                {   //Can't code complete nothing
+                    if (this.buffer.length > 0){
+                        var tempBuffer = this.codeComplete(this.buffer);
+                            if(tempBuffer.length > 0){
+                                this.backspace(this.buffer);
+                                this.buffer = tempBuffer;
+                                this.putText(this.buffer);
+                            }
+                    }
+
                 }
                 else {
                     // This is a "normal" character, so ...
@@ -102,8 +118,8 @@ module TSOS {
             };
         }
 
-        
-        public backspace(text) : void{
+
+        public backspace(text){
            if (text!== ""){
                //Remove the last character from the buffer (So that it's actually gone instead of 'invisible')
                this.buffer = this.buffer.slice(0,-1);
@@ -115,5 +131,42 @@ module TSOS {
 
            }
         }
+
+        public clearLine(text){
+            if (text!== ""){
+                this.buffer = "";
+                var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text);
+                //Move the cursor to account for the deleted character
+                this.currentXPosition = 0;
+                //Draw a rectangle over the deleted character (No pattern buffer ghosts in MY transporter room.)
+                _DrawingContext.clearRect(this.currentXPosition, this.currentYPosition - this.currentFontSize - 1, offset, this.currentFontSize* 2);
+
+            }
+        }
+
+            //There's probably a clever way to do this.
+        public codeComplete (str){
+            //Consider setting up an array for manual and finding a way to pull from that
+            //Otherwise, update this every time you add commands
+            var commandArray = ["ver", "help", "shutdown", "cls", "man", "trace", "rot13", "prompt", "date", "whereami", "morepower", "status", "error", "load"];
+            //Create an empty array to put code-complete options into.
+            var optionsArray = [];
+            var optionsIndex = 0;
+            //Use a regular expression to find a match
+            var search = new RegExp("^" + str + "\\w");
+            //A for loop to go through the whole thing.
+            for(var i =0; i < commandArray.length; i++) {
+                if(commandArray[i].toString().match(search)){
+                    optionsArray.push(commandArray[i].toString());
+                }
+            }
+            if (optionsArray.length > 0) {
+               var completion = optionsArray[optionsIndex];
+                optionsIndex++;
+                if (optionsIndex > optionsArray.length - 1){
+                    optionsIndex = 0;}
+            }
+            return completion;
+        };
     }
  }

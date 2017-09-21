@@ -10,17 +10,20 @@
 var TSOS;
 (function (TSOS) {
     var Console = /** @class */ (function () {
-        function Console(currentFont, currentFontSize, currentXPosition, currentYPosition, buffer) {
+        function Console(currentFont, currentFontSize, currentXPosition, currentYPosition, buffer, recallBuffer //for recalling old input
+        ) {
             if (currentFont === void 0) { currentFont = _DefaultFontFamily; }
             if (currentFontSize === void 0) { currentFontSize = _DefaultFontSize; }
             if (currentXPosition === void 0) { currentXPosition = 0; }
             if (currentYPosition === void 0) { currentYPosition = _DefaultFontSize; }
             if (buffer === void 0) { buffer = ""; }
+            if (recallBuffer === void 0) { recallBuffer = ""; } //for recalling old input
             this.currentFont = currentFont;
             this.currentFontSize = currentFontSize;
             this.currentXPosition = currentXPosition;
             this.currentYPosition = currentYPosition;
             this.buffer = buffer;
+            this.recallBuffer = recallBuffer; //for recalling old input
         }
         Console.prototype.init = function () {
             this.clearScreen();
@@ -42,11 +45,23 @@ var TSOS;
                     // The enter key marks the end of a console command, so ...
                     // ... tell the shell ...
                     _OsShell.handleInput(this.buffer);
+                    //Keep buffer when user presses enter.
+                    this.recallBuffer = this.buffer;
                     // ... and reset our buffer.
                     this.buffer = "";
                 }
                 else if (chr === String.fromCharCode(8)) {
                     this.backspace(this.buffer.charAt(this.buffer.length - 1));
+                }
+                else if (chr == String.fromCharCode(9)) {
+                    if (this.buffer.length > 0) {
+                        var tempBuffer = this.codeComplete(this.buffer);
+                        if (tempBuffer.length > 0) {
+                            this.backspace(this.buffer);
+                            this.buffer = tempBuffer;
+                            this.putText(this.buffer);
+                        }
+                    }
                 }
                 else {
                     // This is a "normal" character, so ...
@@ -110,6 +125,42 @@ var TSOS;
                 _DrawingContext.clearRect(this.currentXPosition, this.currentYPosition - this.currentFontSize - 1, offset, this.currentFontSize * 2);
             }
         };
+        Console.prototype.clearLine = function (text) {
+            if (text !== "") {
+                this.buffer = "";
+                var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text);
+                //Move the cursor to account for the deleted character
+                this.currentXPosition = 0;
+                //Draw a rectangle over the deleted character (No pattern buffer ghosts in MY transporter room.)
+                _DrawingContext.clearRect(this.currentXPosition, this.currentYPosition - this.currentFontSize - 1, offset, this.currentFontSize * 2);
+            }
+        };
+        //There's probably a clever way to do this.
+        Console.prototype.codeComplete = function (str) {
+            //Consider setting up an array for manual and finding a way to pull from that
+            //Otherwise, update this every time you add commands
+            var commandArray = ["ver", "help", "shutdown", "cls", "man", "trace", "rot13", "prompt", "date", "whereami", "morepower", "status", "error", "load"];
+            //Create an empty array to put code-complete options into.
+            var optionsArray = [];
+            var optionsIndex = 0;
+            //Use a regular expression to find a match
+            var search = new RegExp("^" + str + "\\w");
+            //A for loop to go through the whole thing.
+            for (var i = 0; i < commandArray.length; i++) {
+                if (commandArray[i].toString().match(search)) {
+                    optionsArray.push(commandArray[i].toString());
+                }
+            }
+            if (optionsArray.length > 0) {
+                var completion = optionsArray[optionsIndex];
+                optionsIndex++;
+                if (optionsIndex > optionsArray.length - 1) {
+                    optionsIndex = 0;
+                }
+            }
+            return completion;
+        };
+        ;
         return Console;
     }());
     TSOS.Console = Console;
