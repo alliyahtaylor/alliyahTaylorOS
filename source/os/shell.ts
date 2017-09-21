@@ -360,7 +360,7 @@ module TSOS {
         public shellStatus(status) {
             if (status.length > 0) {
                 //set global var _Status equal to user input
-                _Status += status;
+                _Status = status;
             } else {
                 _StdOut.putText("Usage: status <string>  Please supply a string.");
             }

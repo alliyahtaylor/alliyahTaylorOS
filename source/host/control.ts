@@ -129,7 +129,7 @@ module TSOS {
             };
             //Change the earthTime label to display the current date.
             document.getElementById("earthTimeLabel").innerHTML = "Earth Time: " + earthTime.toLocaleDateString("en-US", options);
-            document.getElementById("statusLabel").innerHTML = "Current Status:" + _Status;
+            document.getElementById("statusLabel").innerHTML = "Current Status:" + _Status.toString();
         }
     }
 }

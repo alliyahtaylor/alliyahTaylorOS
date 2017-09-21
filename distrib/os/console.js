@@ -82,12 +82,6 @@ var TSOS;
             this.currentYPosition += _DefaultFontSize +
                 _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) +
                 _FontHeightMargin;
-            //I broke this somehow. Keeping in to figure out what happened here.
-            /*if (this.currentYPosition > _Canvas.height){
-                var scrollBuffer = _DrawingContext.getImageData (0, 0, _Canvas.width, _Canvas.height);
-                this.clearScreen();
-                _DrawingContext.putImageData(scrollBuffer, 0,0);
-            }; */
             if (this.currentYPosition > _Canvas.height) {
                 //A variable that equals the size of one line, used to delete a line and leave space at the bottom.
                 var oneLine = _FontHeightMargin + _DefaultFontSize;
@@ -96,7 +90,7 @@ var TSOS;
                 var scrollBuffer = _DrawingContext.getImageData(0, oneLine, 500, 500);
                 //Clears the canvas.
                 this.clearScreen();
-                //Pastes the buffer image.
+                //Pastes the buffer image back into the canvas.
                 _DrawingContext.putImageData(scrollBuffer, 0, 0);
                 this.currentYPosition = _Canvas.height - oneLine;
             }

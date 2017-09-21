@@ -302,19 +302,23 @@ var TSOS;
         Shell.prototype.shellStatus = function (status) {
             if (status.length > 0) {
                 //set global var _Status equal to user input
-                _Status += status;
+                _Status = status;
             }
             else {
                 _StdOut.putText("Usage: status <string>  Please supply a string.");
             }
             TSOS.Control.dateTimeStatusUpdate();
         };
+        //Sends a test error to activate the BSOD
         Shell.prototype.shellBSOD = function (args) {
             _Kernel.krnTrapError("Test Error, Yellow Alert.");
         };
         Shell.prototype.shellLoad = function (args) {
+            //Get the user input from the user program box
             var userProg = document.getElementById("taProgramInput").value;
+            //set up a regular expression to test the user input against
             var hexTest = new RegExp(/^[A-Fa-f0-9\s]+$/);
+            //see if user input matches the regular expression
             if (userProg.match(hexTest)) {
                 _StdOut.putText("Successful Load.");
             }
