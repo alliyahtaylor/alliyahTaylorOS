@@ -60,7 +60,7 @@ var TSOS;
             else if (((keyCode >= 48) && (keyCode <= 57)) || // digits
                 (keyCode == 32) || // space
                 (keyCode == 13) || // enter
-                (keyCode == 8) || // backspace -- I honestly have no idea why this is broken.
+                (keyCode == 8) || // backspace -- This didn't work because I didn't compile console.ts
                 (keyCode == 9)) {
                 //there has to be a cleaner way to do this
                 if (isShifted) {

@@ -45,7 +45,10 @@ module TSOS {
                     _OsShell.handleInput(this.buffer);
                     // ... and reset our buffer.
                     this.buffer = "";
-                } else {
+                } else if( chr === String.fromCharCode(8)) { //Backspace Key
+                    this.backspace(this.buffer.charAt(this.buffer.length-1));
+                }
+                else {
                     // This is a "normal" character, so ...
                     // ... draw it on the screen...
                     this.putText(chr);
@@ -97,6 +100,20 @@ module TSOS {
               _DrawingContext.putImageData(scrollBuffer, 0,0)
                 this.currentYPosition = _Canvas.height - oneLine;
             };
+        }
+
+        
+        public backspace(text) : void{
+           if (text!== ""){
+               //Remove the last character from the buffer (So that it's actually gone instead of 'invisible')
+               this.buffer = this.buffer.slice(0,-1);
+               var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text);
+               //Move the cursor to account for the deleted character
+               this.currentXPosition -= offset;
+               //Draw a rectangle over the deleted character (No pattern buffer ghosts in MY transporter room.)
+               _DrawingContext.clearRect(this.currentXPosition, this.currentYPosition - this.currentFontSize - 1, offset, this.currentFontSize* 2);
+
+           }
         }
     }
  }

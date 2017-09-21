@@ -45,6 +45,9 @@ var TSOS;
                     // ... and reset our buffer.
                     this.buffer = "";
                 }
+                else if (chr === String.fromCharCode(8)) {
+                    this.backspace(this.buffer.charAt(this.buffer.length - 1));
+                }
                 else {
                     // This is a "normal" character, so ...
                     // ... draw it on the screen...
@@ -95,6 +98,17 @@ var TSOS;
                 this.currentYPosition = _Canvas.height - oneLine;
             }
             ;
+        };
+        Console.prototype.backspace = function (text) {
+            if (text !== "") {
+                //Remove the last character from the buffer (So that it's actually gone instead of 'invisible')
+                this.buffer = this.buffer.slice(0, -1);
+                var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text);
+                //Move the cursor to account for the deleted character
+                this.currentXPosition -= offset;
+                //Draw a rectangle over the deleted character (No pattern buffer ghosts in MY transporter room.)
+                _DrawingContext.clearRect(this.currentXPosition, this.currentYPosition - this.currentFontSize - 1, offset, this.currentFontSize * 2);
+            }
         };
         return Console;
     }());
