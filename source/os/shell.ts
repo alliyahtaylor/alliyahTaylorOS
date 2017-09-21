@@ -91,7 +91,7 @@ module TSOS {
 
             sc = new ShellCommand(this.shellPower,
                 "morepower",
-                "- Transfers more power to the engines.");
+                "- Transfers more power to the engines. SOUND WARNING");
             this.commandList[this.commandList.length] = sc;
 
             sc = new ShellCommand(this.shellStatus,
@@ -282,6 +282,9 @@ module TSOS {
                     case "man":
                         _StdOut.putText("Man displays manual page for topic. USer must include topic. How did you even get here?");
                         break;
+                    case "morepower":
+                        _StdOut.putText("SOUND WARNING. Morepower transfers power to the engines.");
+                        break;
                     case "rot13":
                         _StdOut.putText("Rot13 does rot13 encoding on given text. For when Alan wants to curse in his code.");
                         break;
@@ -356,6 +359,10 @@ module TSOS {
         public shellPower(args) {
             _StdOut.putText("I'm givin' her all she's got, captain!!");
                 //I know this line was never exactly said in TOS, please don't take my Trekkie cred.
+            document.getElementById('body').style.backgroundImage= "url('distrib/images/warp.jpg')";
+            var allshesgot = <HTMLAudioElement>document.getElementById('scottyPlayer');
+            allshesgot.play();
+
         }
         public shellStatus(args) {
             //Go through args array to display multiple words in the status
@@ -373,7 +380,7 @@ module TSOS {
 
         //Sends a test error to activate the BSOD
         public shellBSOD(args){
-            _Kernel.krnTrapError("Test Error, Yellow Alert.");
+            _Kernel.krnTrapError("Test Error, Stand By For Security Drill.");
         }
 
         public shellLoad(args){

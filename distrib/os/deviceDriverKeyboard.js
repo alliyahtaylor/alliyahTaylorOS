@@ -61,7 +61,9 @@ var TSOS;
                 (keyCode == 32) || // space
                 (keyCode == 13) || // enter
                 (keyCode == 8) || // backspace -- This didn't work because I didn't compile console.ts
-                (keyCode == 9)) {
+                (keyCode == 9) || //tab
+                (keyCode == 38) || //UP
+                (keyCode == 40)) {
                 //There has to be a cleaner way to do this.
                 //Could do if statement within case, but that wouldn't change much.
                 if (isShifted) {

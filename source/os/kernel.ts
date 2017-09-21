@@ -173,12 +173,15 @@ module TSOS {
 
         public krnTrapError(msg) {
             Control.hostLog("OS ERROR - TRAP: " + msg);
-            //TODO: Add Red Alert sound and WARN ALAN
             // TODO: Display error on console, perhaps in some sort of colored screen. (Maybe blue?)
             _StdOut.clearScreen();
             _StdOut.putText("Raise Shields. GenesOS has detected a fatal error.");
             _StdOut.advanceLine();
             _StdOut.putText(msg);
+            //redalert sound
+            document.getElementById('body').style.backgroundImage= "url('distrib/images/redalert.jpg')";
+            var redalert = <HTMLAudioElement>document.getElementById('alertPlayer');
+            redalert.play();
             this.krnShutdown();
         }
     }

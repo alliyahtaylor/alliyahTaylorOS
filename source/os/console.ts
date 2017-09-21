@@ -18,7 +18,8 @@ module TSOS {
                     public currentXPosition = 0,
                     public currentYPosition = _DefaultFontSize,
                     public buffer = "",
-                    public recallBuffer= "" //for recalling old input
+                    public recallBuffer = [], //for recalling old input
+                    public recallIndex = -1
          ) {
         }
 
@@ -43,28 +44,37 @@ module TSOS {
                 // Check to see if it's "special" (enter or ctrl-c) or "normal" (anything else that the keyboard device driver gave us).
                 if (chr === String.fromCharCode(13)) { //     Enter key
                     // The enter key marks the end of a console command, so ...
+
+                    //Save the buffer to the recallBuffer array
+                    this.recallBuffer.push(this.buffer)
                     // ... tell the shell ...
                     _OsShell.handleInput(this.buffer);
-                    //Keep buffer when user presses enter.
-                    this.recallBuffer = this.buffer;
                     // ... and reset our buffer.
                     this.buffer = "";
                 } else if( chr === String.fromCharCode(8)) { //Backspace Key
                     this.backspace(this.buffer.charAt(this.buffer.length-1));
                 }
-                else if( chr == String.fromCharCode(9) ) // Up arrow
-                {   //Can't code complete nothing
+                  else if( chr == String.fromCharCode(9) ) // Tab
+                {   //Make sure there is code to complete.
                     if (this.buffer.length > 0){
                         var tempBuffer = this.codeComplete(this.buffer);
                             if(tempBuffer.length > 0){
                                 this.backspace(this.buffer);
                                 this.buffer = tempBuffer;
-                                this.putText(this.buffer);
-                            }
+                                this.putText(this.buffer);}
+                    }
+                }
+                  else if (chr == String.fromCharCode(38)){
+                    if (this.recallBuffer.length > 0){
+                        this.codeRecallUp();
                     }
 
                 }
-                else {
+                  else if(chr == String.fromCharCode(40)){
+                      if (this.recallBuffer.length>0){
+                      this.codeRecallDown(); }
+                }
+                  else {
                     // This is a "normal" character, so ...
                     // ... draw it on the screen...
                     this.putText(chr);
@@ -156,5 +166,35 @@ module TSOS {
             }
             return completion;
         };
+            //code recall if you press the up key
+        public codeRecallUp(){
+                //If the index is smaller than the last index, let it increment up
+            if (this.recallIndex < this.recallBuffer.length -1)
+                //move forward through the array
+                this.recallIndex++;
+
+            if (this.buffer != "")
+                    this.backspace(this.buffer);
+            //set buffer to recalled code
+            this.buffer = this.recallBuffer[this.recallIndex];
+            //show recalled code
+            this.putText(this.buffer);
+            }
+            //Code recall if you press the down key
+        public codeRecallDown(){
+            //If the index is bigger than the first index, let it increment down
+            if (this.recallIndex > 0)
+                //move back in the array
+                this.recallIndex--;
+            if (this.buffer != " ")
+                this.backspace(this.buffer);
+            //set the buffer to the recalled code
+            this.buffer = this.recallBuffer[this.recallIndex];
+            //Show recalled code
+            this.putText(this.buffer);
+        }
     }
- }
+
+}
+
+

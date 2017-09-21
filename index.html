@@ -31,11 +31,11 @@
    <!-- Other Routines -->
    <script type="text/javascript" src="distrib/utils.js"></script>
    <!-- Uncomment the line below to enable GLaDOS testing. -->
-<!--<script type="text/javascript" src="http://alanclasses.github.io/TSOS/test/glados-ip1.js"></script> -->
+   <script type="text/javascript" src="http://alanclasses.github.io/TSOS/test/glados-ip1.js"></script>
 
 </head>
 
-<body onload="onDocumentLoad()">
+<body onload="onDocumentLoad()" id ="body">
 
 <div id="divMain" style="width:100%;">
 
@@ -110,4 +110,11 @@
 </p>
 
 </body>
+<!--Audio players for kernel error and morepower command.-->
+<audio id = "scottyPlayer" preload="auto" autobuffer> 
+  <source src="distrib/images/allshesgot.mp3" />
+</audio>
+<audio id = "alertPlayer" preload="auto" autobuffer> 
+  <source src="distrib/images/redalert.mp3" />
+</audio>
 </html>

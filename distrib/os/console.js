@@ -10,20 +10,22 @@
 var TSOS;
 (function (TSOS) {
     var Console = /** @class */ (function () {
-        function Console(currentFont, currentFontSize, currentXPosition, currentYPosition, buffer, recallBuffer //for recalling old input
-        ) {
+        function Console(currentFont, currentFontSize, currentXPosition, currentYPosition, buffer, recallBuffer, //for recalling old input
+            recallIndex) {
             if (currentFont === void 0) { currentFont = _DefaultFontFamily; }
             if (currentFontSize === void 0) { currentFontSize = _DefaultFontSize; }
             if (currentXPosition === void 0) { currentXPosition = 0; }
             if (currentYPosition === void 0) { currentYPosition = _DefaultFontSize; }
             if (buffer === void 0) { buffer = ""; }
-            if (recallBuffer === void 0) { recallBuffer = ""; } //for recalling old input
+            if (recallBuffer === void 0) { recallBuffer = []; }
+            if (recallIndex === void 0) { recallIndex = -1; }
             this.currentFont = currentFont;
             this.currentFontSize = currentFontSize;
             this.currentXPosition = currentXPosition;
             this.currentYPosition = currentYPosition;
             this.buffer = buffer;
-            this.recallBuffer = recallBuffer; //for recalling old input
+            this.recallBuffer = recallBuffer;
+            this.recallIndex = recallIndex;
         }
         Console.prototype.init = function () {
             this.clearScreen();
@@ -43,10 +45,10 @@ var TSOS;
                 // Check to see if it's "special" (enter or ctrl-c) or "normal" (anything else that the keyboard device driver gave us).
                 if (chr === String.fromCharCode(13)) {
                     // The enter key marks the end of a console command, so ...
+                    //Save the buffer to the recallBuffer array
+                    this.recallBuffer.push(this.buffer);
                     // ... tell the shell ...
                     _OsShell.handleInput(this.buffer);
-                    //Keep buffer when user presses enter.
-                    this.recallBuffer = this.buffer;
                     // ... and reset our buffer.
                     this.buffer = "";
                 }
@@ -61,6 +63,16 @@ var TSOS;
                             this.buffer = tempBuffer;
                             this.putText(this.buffer);
                         }
+                    }
+                }
+                else if (chr == String.fromCharCode(38)) {
+                    if (this.recallBuffer.length > 0) {
+                        this.codeRecallUp();
+                    }
+                }
+                else if (chr == String.fromCharCode(40)) {
+                    if (this.recallBuffer.length > 0) {
+                        this.codeRecallDown();
                     }
                 }
                 else {
@@ -151,6 +163,32 @@ var TSOS;
             return completion;
         };
         ;
+        //code recall if you press the up key
+        Console.prototype.codeRecallUp = function () {
+            //If the index is smaller than the last index, let it increment up
+            if (this.recallIndex < this.recallBuffer.length - 1)
+                //move forward through the array
+                this.recallIndex++;
+            if (this.buffer != "")
+                this.backspace(this.buffer);
+            //set buffer to recalled code
+            this.buffer = this.recallBuffer[this.recallIndex];
+            //show recalled code
+            this.putText(this.buffer);
+        };
+        //Code recall if you press the down key
+        Console.prototype.codeRecallDown = function () {
+            //If the index is bigger than the first index, let it increment down
+            if (this.recallIndex > 0)
+                //move back in the array
+                this.recallIndex--;
+            if (this.buffer != " ")
+                this.backspace(this.buffer);
+            //set the buffer to the recalled code
+            this.buffer = this.recallBuffer[this.recallIndex];
+            //Show recalled code
+            this.putText(this.buffer);
+        };
         return Console;
     }());
     TSOS.Console = Console;

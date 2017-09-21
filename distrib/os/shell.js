@@ -53,7 +53,7 @@ var TSOS;
             this.commandList[this.commandList.length] = sc;
             sc = new TSOS.ShellCommand(this.shellWhere, "whereami", "- Shows the user's current location.");
             this.commandList[this.commandList.length] = sc;
-            sc = new TSOS.ShellCommand(this.shellPower, "morepower", "- Transfers more power to the engines.");
+            sc = new TSOS.ShellCommand(this.shellPower, "morepower", "- Transfers more power to the engines. SOUND WARNING");
             this.commandList[this.commandList.length] = sc;
             sc = new TSOS.ShellCommand(this.shellStatus, "status", "<string> - Sets the status.");
             this.commandList[this.commandList.length] = sc;
@@ -222,6 +222,9 @@ var TSOS;
                     case "man":
                         _StdOut.putText("Man displays manual page for topic. USer must include topic. How did you even get here?");
                         break;
+                    case "morepower":
+                        _StdOut.putText("SOUND WARNING. Morepower transfers power to the engines.");
+                        break;
                     case "rot13":
                         _StdOut.putText("Rot13 does rot13 encoding on given text. For when Alan wants to curse in his code.");
                         break;
@@ -298,6 +301,9 @@ var TSOS;
         Shell.prototype.shellPower = function (args) {
             _StdOut.putText("I'm givin' her all she's got, captain!!");
             //I know this line was never exactly said in TOS, please don't take my Trekkie cred.
+            document.getElementById('body').style.backgroundImage = "url('distrib/images/warp.jpg')";
+            var allshesgot = document.getElementById('scottyPlayer');
+            allshesgot.play();
         };
         Shell.prototype.shellStatus = function (args) {
             //Go through args array to display multiple words in the status
@@ -315,7 +321,7 @@ var TSOS;
         };
         //Sends a test error to activate the BSOD
         Shell.prototype.shellBSOD = function (args) {
-            _Kernel.krnTrapError("Test Error, Yellow Alert.");
+            _Kernel.krnTrapError("Test Error, Stand By For Security Drill.");
         };
         Shell.prototype.shellLoad = function (args) {
             //Get the user input from the user program box
