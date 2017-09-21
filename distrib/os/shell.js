@@ -299,10 +299,14 @@ var TSOS;
             _StdOut.putText("I'm givin' her all she's got, captain!!");
             //I know this line was never exactly said in TOS, please don't take my Trekkie cred.
         };
-        Shell.prototype.shellStatus = function (status) {
-            if (status.length > 0) {
+        Shell.prototype.shellStatus = function (args) {
+            //Go through args array to display multiple words in the status
+            if (args.length > 0) {
+                _Status = "";
                 //set global var _Status equal to user input
-                _Status = status;
+                for (var i = 0; i < args.length; i++) {
+                    _Status += args[i] + " ";
+                }
             }
             else {
                 _StdOut.putText("Usage: status <string>  Please supply a string.");

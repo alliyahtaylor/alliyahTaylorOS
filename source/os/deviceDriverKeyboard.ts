@@ -55,38 +55,39 @@ module TSOS {
                 (keyCode == 8)                      ||   // backspace -- This didn't work because I didn't compile console.ts
                 (keyCode == 9)                      ){   //tab
 
-                //there has to be a cleaner way to do this
+                //There has to be a cleaner way to do this.
+                //Could do if statement within case, but that wouldn't change much.
                 if(isShifted){
                     switch (keyCode){
                         case 48:
-                            keyCode= 41;
+                            keyCode= 41; //)
                             break;
                         case 49:
-                            keyCode= 33;
+                            keyCode= 33; //!
                             break;
                         case 50:
-                            keyCode= 64;
+                            keyCode= 64; //@
                             break;
                         case 51:
-                            keyCode= 35;
+                            keyCode= 35; //#
                             break;
                         case 52:
-                            keyCode= 36;
+                            keyCode= 36; //$
                             break;
                         case 53:
-                            keyCode= 37;
+                            keyCode= 37; //%
                             break;
                         case 54:
-                            keyCode= 94;
+                            keyCode= 94; //^
                             break;
                         case 55:
-                            keyCode= 38;
+                            keyCode= 38; //&
                             break;
                         case 56:
-                            keyCode= 42;
+                            keyCode= 42; //*
                             break;
                         case 57:
-                            keyCode= 40;
+                            keyCode= 40; //(
                             break;
                     }
                 }

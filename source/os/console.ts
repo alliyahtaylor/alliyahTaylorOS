@@ -132,18 +132,6 @@ module TSOS {
            }
         }
 
-        public clearLine(text){
-            if (text!== ""){
-                this.buffer = "";
-                var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text);
-                //Move the cursor to account for the deleted character
-                this.currentXPosition = 0;
-                //Draw a rectangle over the deleted character (No pattern buffer ghosts in MY transporter room.)
-                _DrawingContext.clearRect(this.currentXPosition, this.currentYPosition - this.currentFontSize - 1, offset, this.currentFontSize* 2);
-
-            }
-        }
-
             //There's probably a clever way to do this.
         public codeComplete (str){
             //Consider setting up an array for manual and finding a way to pull from that
