@@ -29,6 +29,9 @@ const KEYBOARD_IRQ: number = 1;
 // TODO: Make a global object and use that instead of the "_" naming convention in the global namespace.
 //
 var _CPU: TSOS.Cpu;  // Utilize TypeScript's type annotation system to ensure that _CPU is an instance of the Cpu class.
+var _Memory: TSOS.Memory;
+var _MemManager: TSOS.MemManager;
+var _PCBArr = [];
 
 var _OSclock: number = 0;  // Page 23.
 

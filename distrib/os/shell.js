@@ -326,17 +326,41 @@ var TSOS;
         Shell.prototype.shellLoad = function (args) {
             //Get the user input from the user program box
             var userProg = document.getElementById("taProgramInput").value;
-            //set up a regular expression to test the user input against
-            var hexTest = new RegExp(/^[A-Fa-f0-9\s]+$/);
-            //see if user input matches the regular expression
-            if (userProg.match(hexTest)) {
-                _StdOut.putText("Successful Load.");
+            //make sure there's actually a user input
+            if (userProg.length < 1) {
+                _StdOut.putText("Please input a program.");
+            }
+            else if (userProg.length > 256) {
+                //Error if program is too large for memory.
+                _StdOut.putText("Error. Program too large.");
             }
             else {
-                _StdOut.putText("Invalid program, non-hex digits.");
+                //set up a regular expression to test the user input against
+                var hexTest = new RegExp(/^[A-Fa-f0-9\s]+$/);
+                //see if user input matches the regular expression
+                if (userProg.match(hexTest)) {
+                    //Loads program only if it exists, is the right side, and only has hex
+                    //get userProgram down to array of op codes.
+                    var progString = '';
+                    var progArr = userProg.split(' ');
+                    for (var i = 0; i < progArr.length; i++) {
+                        progString += progArr[i];
+                    }
+                    var ind = progString.split('');
+                    var opCodes = [];
+                    //increment by 2 to get both hex digits
+                    for (var i = 0; i < ind.length; i += 2) {
+                        opCodes.push(ind[i] + ind[i + 1]);
+                    }
+                    _StdOut.putText('Loaded Process' + num);
+                }
+                else {
+                    //Error if program has non-hex digits.
+                    _StdOut.putText("Invalid program, non-hex digits.");
+                }
             }
+            TSOS.Control.updateMemTable();
         };
-        ;
         return Shell;
     }());
     TSOS.Shell = Shell;

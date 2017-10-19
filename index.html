@@ -31,7 +31,7 @@
    <!-- Other Routines -->
    <script type="text/javascript" src="distrib/utils.js"></script>
    <!-- Uncomment the line below to enable GLaDOS testing. -->
-   <script type="text/javascript" src="http://alanclasses.github.io/TSOS/test/glados-ip1.js"></script>
+  <!-- <script type="text/javascript" src="http://alanclasses.github.io/TSOS/test/glados-ip1.js"></script> -->
 
 </head>
 
@@ -82,11 +82,13 @@
          <br>
          <textarea name="taHostLog"
                    id  ="taHostLog"
-                   rows="26"
+                   rows="15"
                    cols="48"
          ></textarea>
       </label>
    </div>
+   
+   
 
    <div id="divUserProgramInput" style="margin-left:520px;">
       <label style="color: yellow;">
@@ -94,14 +96,39 @@
          <br>
          <textarea name="taProgramInput"
                    id  ="taProgramInput"
-                   rows="8"
+                   rows="4"
                    cols="48"
          ></textarea>
       </label>
    </div>
+   <div style = "color:yellow; margin-left: 520px; width:250px;">
+   <label> Memory </label>
+   <div class = "panel-body" style = "height:145px;overflow-y:auto;">
+   <table id="memTable" class = "table"></table>
+   </div>
+   </div>
+   <table id="procTable" class="table" style = "color:yellow; margin-left: 20px;">
+		<tr>
+			<th>opCode</th>
+			<th>PC</th>
+			<th>Acc</th>
+			<th>XReg</th>
+			<th>YReg</th>
+			<th>ZFlag</th>
+		</tr>
+		<tr>
+			<td>N/A</td>
+			<td>0</td>
+			<td>0</td>
+			<td>0</td>
+			<td>0</td>
+			<td>0</td>
+		</tr>
+
+</table>
 </div>
 
-<p class="footerText" style="clear:both;">
+<p class="footerText" style="clear: both;">
    <br>
    Copyright &copy; 2008 - 2016 No Rights Reserved.
    <br>

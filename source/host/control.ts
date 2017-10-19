@@ -27,6 +27,52 @@ module TSOS {
 
     export class Control {
 
+        //Initialize memTable display
+        public static memTable(): void {
+            var display = document.getElementById('memTable');
+            var htmlString = '';
+
+            // For each row in the Memory table, generate column and populate with 0s
+            for(var i = 0; i < 256; i += 8){
+                var iStr = i.toString();
+                if(i < 10){
+                    iStr = '0' + iStr;
+                }
+                if(i < 100){
+                    iStr = '0' + iStr;
+                }
+                htmlString += '<tr>' + '<th>0x' + iStr + '</th>' + '<th>00</th>' + '<th>00</th>' + '<th>00</th>' + '<th>00</th>';
+                htmlString += '<th>00</th>' + '<th>00</th>' + '<th>00</th>' + '<th>00</th>' + '</tr>' ;
+            }
+            display.innerHTML = htmlString;
+        }
+        public static updateMemTable(){
+            var display = document.getElementById('MemTable');
+            var htmlString = '';
+            var mem: string = _Memory.toString();
+            var memArr = mem.split(' ');
+            var loc = 0;
+            for(var i = 0; i < 256; i += 8){
+                var iStr = i.toString();
+                if(i < 10){
+                    iStr = '0' + iStr;
+                }
+                if(i < 100){
+                    iStr = '0' + iStr;
+                }
+                htmlString += '<tr>' + '<th>0x' + iStr + '</th>' + '<th>' + memArr[loc++] + '</th>' + '<th>' + memArr[loc++];
+                htmlString += '</th>' + '<th>' + memArr[loc++] + '</th>' + '<th>' + memArr[loc++] + '</th>';
+                htmlString += '<th>' + memArr[loc++] + '</th>' + '<th>' + memArr[loc++] + '</th>' + '<th>' + memArr[loc++];
+                htmlString += '</th>' + '<th>' + memArr[loc++] + '</th>' + '</tr>' ;
+            }
+            display.innerHTML = htmlString;
+        }
+        public static updateProcTable(pcb, opCode){
+            var procTable = document.getElementById('procTable');
+            procTable.innerHTML = '<tr><th>OpCode</th><th>PC</th><th>Acc</th><th>X</th><th>Y</th><th>Z</th></tr>' + '<tr>' +'<td>' + opCode + '</td>' + '<td>' + pcb.PC + '</td>' + '<td>' + pcb.Acc + '</td>' + '<td>' + pcb.Xreg + '</td>' + '<td>' + pcb.Yreg + '</td>' + '<td>' + pcb.Zflag + '</td>' + '</tr>';
+        }
+
+
         public static hostInit(): void {
             // This is called from index.html's onLoad event via the onDocumentLoad function pointer.
 
@@ -46,6 +92,9 @@ module TSOS {
             // Set focus on the start button.
             // Use the TypeScript cast to HTMLInputElement
             (<HTMLInputElement> document.getElementById("btnStartOS")).focus();
+
+            //build the memory display
+            Control.memTable();
 
             // Check for our testing and enrichment core, which
             // may be referenced here (from index.html) as function Glados().
@@ -91,7 +140,6 @@ module TSOS {
 
             // .. set focus on the OS console display ...
             document.getElementById("display").focus();
-
             // ... Create and initialize the CPU (because it's part of the hardware)  ...
             _CPU = new Cpu();  // Note: We could simulate multi-core systems by instantiating more than one instance of the CPU here.
             _CPU.init();       //       There's more to do, like dealing with scheduling and such, but this would be a start. Pretty cool.
@@ -131,5 +179,6 @@ module TSOS {
             document.getElementById("earthTimeLabel").innerHTML = "Earth Time: " + earthTime.toLocaleDateString("en-US", options);
             document.getElementById("statusLabel").innerHTML = "Current Status: " + _Status;
         }
+
     }
 }

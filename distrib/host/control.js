@@ -26,6 +26,49 @@ var TSOS;
     var Control = /** @class */ (function () {
         function Control() {
         }
+        //Initialize memTable display
+        Control.memTable = function () {
+            var display = document.getElementById('memTable');
+            var htmlString = '';
+            // For each row in the Memory table, generate column and populate with 0s
+            for (var i = 0; i < 256; i += 8) {
+                var iStr = i.toString();
+                if (i < 10) {
+                    iStr = '0' + iStr;
+                }
+                if (i < 100) {
+                    iStr = '0' + iStr;
+                }
+                htmlString += '<tr>' + '<th>0x' + iStr + '</th>' + '<th>00</th>' + '<th>00</th>' + '<th>00</th>' + '<th>00</th>';
+                htmlString += '<th>00</th>' + '<th>00</th>' + '<th>00</th>' + '<th>00</th>' + '</tr>';
+            }
+            display.innerHTML = htmlString;
+        };
+        Control.updateMemTable = function () {
+            var display = document.getElementById('MemTable');
+            var htmlString = '';
+            var mem = _Memory.toString();
+            var memArr = mem.split(' ');
+            var loc = 0;
+            for (var i = 0; i < 256; i += 8) {
+                var iStr = i.toString();
+                if (i < 10) {
+                    iStr = '0' + iStr;
+                }
+                if (i < 100) {
+                    iStr = '0' + iStr;
+                }
+                htmlString += '<tr>' + '<th>0x' + iStr + '</th>' + '<th>' + memArr[loc++] + '</th>' + '<th>' + memArr[loc++];
+                htmlString += '</th>' + '<th>' + memArr[loc++] + '</th>' + '<th>' + memArr[loc++] + '</th>';
+                htmlString += '<th>' + memArr[loc++] + '</th>' + '<th>' + memArr[loc++] + '</th>' + '<th>' + memArr[loc++];
+                htmlString += '</th>' + '<th>' + memArr[loc++] + '</th>' + '</tr>';
+            }
+            display.innerHTML = htmlString;
+        };
+        Control.updateProcTable = function (pcb, opCode) {
+            var procTable = document.getElementById('procTable');
+            procTable.innerHTML = '<tr><th>OpCode</th><th>PC</th><th>Acc</th><th>X</th><th>Y</th><th>Z</th></tr>' + '<tr>' + '<td>' + opCode + '</td>' + '<td>' + pcb.PC + '</td>' + '<td>' + pcb.Acc + '</td>' + '<td>' + pcb.Xreg + '</td>' + '<td>' + pcb.Yreg + '</td>' + '<td>' + pcb.Zflag + '</td>' + '</tr>';
+        };
         Control.hostInit = function () {
             // This is called from index.html's onLoad event via the onDocumentLoad function pointer.
             // Get a global reference to the canvas.  TODO: Should we move this stuff into a Display Device Driver?
@@ -40,6 +83,8 @@ var TSOS;
             // Set focus on the start button.
             // Use the TypeScript cast to HTMLInputElement
             document.getElementById("btnStartOS").focus();
+            //build the memory display
+            Control.memTable();
             // Check for our testing and enrichment core, which
             // may be referenced here (from index.html) as function Glados().
             if (typeof Glados === "function") {
