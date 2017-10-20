@@ -5,10 +5,9 @@ var TSOS;
             this.size = size;
             this.memory = [];
             this.memory = new Array(size);
-            this.init();
         }
         Memory.prototype.init = function () {
-            for (var i = 0; i < 256; i++) {
+            for (var i = 0; i < this.memory.length; i++) {
                 this.memory[i] = '00';
             }
         };
