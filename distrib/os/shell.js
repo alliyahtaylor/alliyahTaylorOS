@@ -352,14 +352,13 @@ var TSOS;
                     for (var i = 0; i < ind.length; i += 2) {
                         opCodes.push(ind[i] + ind[i + 1]);
                     }
-                    _StdOut.putText('Loaded Process' + num);
+                    _StdOut.putText('Loaded Process');
                 }
                 else {
                     //Error if program has non-hex digits.
                     _StdOut.putText("Invalid program, non-hex digits.");
                 }
             }
-            TSOS.Control.updateMemTable();
         };
         return Shell;
     }());

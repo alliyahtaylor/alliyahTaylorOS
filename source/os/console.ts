@@ -99,6 +99,9 @@ module TSOS {
                 _DrawingContext.drawText(this.currentFont, this.currentFontSize, this.currentXPosition, this.currentYPosition, text);
                 // Move the current X position.
                 var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text);
+                if (this.currentXPosition + offset > 500){
+                    this.advanceLine();
+                }
                 this.currentXPosition = this.currentXPosition + offset;
             }
          }

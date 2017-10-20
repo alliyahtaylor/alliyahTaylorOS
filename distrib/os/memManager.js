@@ -8,7 +8,7 @@ var TSOS;
         }
         MemManager.prototype.init = function () {
         };
-        MemManager.load = function (program) {
+        MemManager.prototype.load = function (program) {
             //create a new pcb
             /* var pcb = new TSOS.Pcb();
             for (var i = 0; i < 256; i++){

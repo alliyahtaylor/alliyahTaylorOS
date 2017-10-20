@@ -7,7 +7,7 @@ module TSOS {
         public init() : void{
         }
 
-        public static load(program) {
+        public load(program) {
         //create a new pcb
            /* var pcb = new TSOS.Pcb();
            for (var i = 0; i < 256; i++){
