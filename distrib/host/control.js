@@ -40,6 +40,8 @@ var TSOS;
             // Set focus on the start button.
             // Use the TypeScript cast to HTMLInputElement
             document.getElementById("btnStartOS").focus();
+            //Build the memory display
+            Control.memTable();
             // Check for our testing and enrichment core, which
             // may be referenced here (from index.html) as function Glados().
             if (typeof Glados === "function") {
@@ -78,8 +80,9 @@ var TSOS;
             // .. set focus on the OS console display ...
             document.getElementById("display").focus();
             // ... Create and initialize the CPU (because it's part of the hardware)  ...
-            _CPU = new TSOS.Cpu(); // Note: We could simulate multi-core systems by instantiating more than one instance of the CPU here.
-            _CPU.init(); //       There's more to do, like dealing with scheduling and such, but this would be a start. Pretty cool.
+            _CPU = new TSOS.Cpu(); // Note: We could simulate multi-core systems by instantiating more than one instance of the CPU here.//       There's more to do, like dealing with scheduling and such, but this would be a start. Pretty cool.
+            _Memory = new TSOS.Memory();
+            _Memory.init();
             // ... then set the host clock pulse ...
             _hardwareClockID = setInterval(TSOS.Devices.hostClockPulse, CPU_CLOCK_INTERVAL);
             // .. and call the OS Kernel Bootstrap routine.
@@ -112,6 +115,44 @@ var TSOS;
             //Change the earthTime label to display the current date.
             document.getElementById("earthTimeLabel").innerHTML = "Earth Time: " + earthTime.toLocaleDateString("en-US", options);
             document.getElementById("statusLabel").innerHTML = "Current Status: " + _Status;
+        };
+        Control.memTable = function () {
+            var display = document.getElementById('memTable');
+            var htmlString = '';
+            // For each row in the Memory table, generate column and populate with 0s
+            for (var i = 0; i < 256; i += 8) {
+                var iStr = i.toString();
+                if (i < 10) {
+                    iStr = '0' + iStr;
+                }
+                if (i < 100) {
+                    iStr = '0' + iStr;
+                }
+                htmlString += '<tr>' + '<th>0x' + iStr + '</th>' + '<th></th>' + '<th></th>' + '<th></th>' + '<th></th>';
+                htmlString += '<th></th>' + '<th></th>' + '<th></th>' + '<th></th>' + '</tr>';
+            }
+            display.innerHTML = htmlString;
+        };
+        Control.updateMemTable = function () {
+            var display = document.getElementById('MemTable');
+            var htmlString = '';
+            var mem = _Memory.toString();
+            var memArr = mem.split(' ');
+            var loc = 0;
+            for (var i = 0; i < 256; i += 8) {
+                var iStr = i.toString();
+                if (i < 10) {
+                    iStr = '0' + iStr;
+                }
+                if (i < 100) {
+                    iStr = '0' + iStr;
+                }
+                htmlString += '<tr>' + '<th>0x' + iStr + '</th>' + '<th>' + memArr[loc++] + '</th>' + '<th>' + memArr[loc++];
+                htmlString += '</th>' + '<th>' + memArr[loc++] + '</th>' + '<th>' + memArr[loc++] + '</th>';
+                htmlString += '<th>' + memArr[loc++] + '</th>' + '<th>' + memArr[loc++] + '</th>' + '<th>' + memArr[loc++];
+                htmlString += '</th>' + '<th>' + memArr[loc++] + '</th>' + '</tr>';
+            }
+            display.innerHTML = htmlString;
         };
         return Control;
     }());
