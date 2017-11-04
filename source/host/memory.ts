@@ -1,13 +1,10 @@
 module TSOS{
     export class Memory {
-        public memory = [];
-        constructor(public size: number){
-            this.memory = new Array(size);
-        }
+        constructor(public memory = []){}
 
         public init(): void{
-            for (var i = 0; i < this.memory.length; i++){
-                this.memory[i] = '00';
+            for (var i = 0; i < 768; i++){
+                this.memory.push(0);
             }
         }
         public setOp(loc, code){

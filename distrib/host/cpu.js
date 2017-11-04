@@ -41,55 +41,55 @@ var TSOS;
         Cpu.prototype.cycle = function () {
             _Kernel.krnTrace('CPU cycle');
             // TODO: Accumulate CPU usage and profiling statistics here.
+            TSOS.Control.updateMemTable();
             // Do the real work here. Be sure to set this.isExecuting appropriately.
-            switch (this.opCode) {
-                case "A9"://Load the accumulator with a constant
+            /*switch (this.opCode) {
+                case "A9": //Load the accumulator with a constant
                     this.loadAccCon();
                     break;
-                case "AD"://Load the accumulator from memory
+                case "AD": //Load the accumulator from memory
                     this.loadAccMem();
                     break;
-                case "8D"://Store the accumulator in memory
+                case "8D": //Store the accumulator in memory
                     this.storeAccMem();
                     break;
-                case "6D"://Add with carry
+                case "6D": //Add with carry
                     this.addWithCarry();
                     break;
-                case "A2":// Load the X reg with a constant
+                case "A2": // Load the X reg with a constant
                     this.loadXCon();
                     break;
-                case "AE":// Load the X reg from memory
+                case "AE": // Load the X reg from memory
                     this.loadXMem();
                     break;
-                case "A0":// Load the Y reg with a constant
+                case "A0": // Load the Y reg with a constant
                     this.loadYCon();
                     break;
-                case "AC":// Load the Y reg from memory
+                case "AC": // Load the Y reg from memory
                     this.loadYMem();
                     break;
-                case "EA"://No Operation
+                case "EA": //No Operation
                     this.PC++;
                     break;
-                case "00"://Break, actually system call
+                case "00": //Break, actually system call
                     this.sysBreak();
                     break;
-                case "EC"://Compare byte in mem to x reg, set z flag if equal
+                case "EC": //Compare byte in mem to x reg, set z flag if equal
                     this.compareX();
                     break;
-                case "D0":// Branch n bytes if z flag = 0
+                case "D0": // Branch n bytes if z flag = 0
                     this.branch();
                     break;
-                case "EE"://Increment the value of a byte
+                case "EE": //Increment the value of a byte
                     this.incrementByte();
                     break;
-                case "FF"://System call
+                case "FF": //System call
                     this.sysCall();
                     break;
                 default:
                     this.sysBreak();
                     this.isExecuting = false;
-                    break;
-            }
+                    break;} */
         };
         //The below has a lot of PC++ to increment PC every single time we read/write an opCode
         Cpu.prototype.loadAccCon = function () {
@@ -111,7 +111,9 @@ var TSOS;
             this.PC++;
             var addr = parseInt(_MemManager.readMem(this.currPCB, this.PC), 16);
             this.PC++;
-            _MemManager.writeMem(this.currPCB, addr, this.Acc.toString(16));
+            _MemManager.writeMem(
+            // this.currPCB,
+            addr, this.Acc.toString(16));
             this.PC++;
         };
         Cpu.prototype.addWithCarry = function () {
@@ -175,7 +177,9 @@ var TSOS;
             this.PC++;
             var val = parseInt(_MemManager.readMem(this.currPCB, addr), 16);
             val++;
-            _MemManager.writeMem(this.currPCB, addr, val.toString(16));
+            _MemManager.writeMem(
+            //this.currPCB,
+            addr, val.toString(16));
             this.PC++;
         };
         Cpu.prototype.sysCall = function () {

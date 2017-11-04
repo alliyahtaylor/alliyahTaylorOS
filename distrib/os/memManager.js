@@ -1,37 +1,27 @@
-///<reference path="../globals.ts" />
-///<reference path="../os/pcb.ts" />
-///<reference path="../host/memory.ts" />
 var TSOS;
 (function (TSOS) {
     var MemManager = /** @class */ (function () {
-        function MemManager() {
+        function MemManager(currPID) {
+            if (currPID === void 0) { currPID = [0]; }
+            this.currPID = currPID;
         }
-        MemManager.prototype.init = function () {
-        };
-        MemManager.prototype.load = function (program) {
-            //create a new pcb
-            /* var pcb = new TSOS.Pcb();
-            for (var i = 0; i < 256; i++){
-                if (i > 256){
-                    break;
-                }
-             _Memory.setOp(i, program[i]);
-            }*/
-            var pID = 0;
-            return pID;
-        };
-        MemManager.prototype.setProgram = function (code) {
-            var opArr = code.split(' ');
-            for (var i = 0; i < opArr.length; i++) {
-                var opCode = opArr[i];
-                _Memory[i] = opCode;
-            }
-            TSOS.Control.updateMemTable();
+        MemManager.prototype.incPID = function () {
+            var n = this.currPID.length;
+            this.currPID.push(n);
+            //Create a new PCB and load op codes into memory
+            /*  for ( let i = 0; i < 255; i++){
+                  let opCode = '';
+              if(program[i] === undefined){
+                  opCode = '00'
+              } else {
+                  opCode = program[i].toString();
+              }
+              _Memory.setOp(i, opCode);}}*/
         };
         MemManager.prototype.readMem = function (PCB, loc) {
             return _Memory.getOp(loc);
         };
-        MemManager.prototype.writeMem = function (PCB, loc, code) {
+        MemManager.prototype.writeMem = function (loc, code) {
             _Memory.setOp(loc, code);
         };
         return MemManager;

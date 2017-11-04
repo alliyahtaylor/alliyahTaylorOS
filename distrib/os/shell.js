@@ -276,7 +276,6 @@ var TSOS;
                 _StdOut.putText(args.join(' ') + " = '" + TSOS.Utils.rot13(args.join(' ')) + "'");
             }
             else {
-                _StdOut.putText("Usage: rot13 <string>  Please supply a string.");
             }
         };
         Shell.prototype.shellPrompt = function (args) {
@@ -348,11 +347,13 @@ var TSOS;
                     }
                     var ind = progString.split('');
                     var opCodes = [];
-                    //increment by 2 to get both hex digits
-                    for (var i = 0; i < ind.length; i += 2) {
-                        opCodes.push(ind[i] + ind[i + 1]);
+                    for (var i = 0; i < ind.length; i++) {
+                        _MemManager.writeMem(i, ind[i]);
                     }
-                    _StdOut.putText('Loaded Process');
+                    var PID = _MemManager.currPID[_MemManager.currPID.length - 1];
+                    _StdOut.putText("Loaded PID " + PID);
+                    //Increment the PID so that the next program has a different PID
+                    _MemManager.incPID();
                 }
                 else {
                     //Error if program has non-hex digits.

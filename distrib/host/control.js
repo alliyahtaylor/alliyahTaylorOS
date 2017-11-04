@@ -31,7 +31,7 @@ var TSOS;
             var display = document.getElementById('memTable');
             var htmlString = '';
             // For each row in the Memory table, generate column and populate with 0s
-            for (var i = 0; i < 256; i += 8) {
+            for (var i = 0; i < 768; i += 8) {
                 var iStr = i.toString();
                 if (i < 10) {
                     iStr = '0' + iStr;
@@ -48,9 +48,9 @@ var TSOS;
             var display = document.getElementById('MemTable');
             var htmlString = '';
             var mem = _Memory.toString();
-            var memArr = mem.split(' ');
+            var memArr = mem.split('');
             var loc = 0;
-            for (var i = 0; i < 256; i += 8) {
+            for (var i = 0; i < 768; i += 8) {
                 var iStr = i.toString();
                 if (i < 10) {
                     iStr = '0' + iStr;
@@ -122,12 +122,13 @@ var TSOS;
             document.getElementById("btnReset").disabled = false;
             // .. set focus on the OS console display ...
             document.getElementById("display").focus();
-            // ... Create and initialize the CPU (and Memory) (because it's part of the hardware)  ...
+            // ... Create and initialize the CPU and Memory (because it's part of the hardware)  ...
             _CPU = new TSOS.Cpu(); // Note: We could simulate multi-core systems by instantiating more than one instance of the CPU here.
             _CPU.init(); //       There's more to do, like dealing with scheduling and such, but this would be a start. Pretty cool.
-            // I WANT to initialize the memory here, but that breaks everything.
-            _Memory = new TSOS.Memory(256);
+            _Memory = new TSOS.Memory();
             _Memory.init();
+            _MemManager = new TSOS.MemManager();
+            _PCB = new TSOS.Pcb();
             // ... then set the host clock pulse ...
             _hardwareClockID = setInterval(TSOS.Devices.hostClockPulse, CPU_CLOCK_INTERVAL);
             // .. and call the OS Kernel Bootstrap routine.

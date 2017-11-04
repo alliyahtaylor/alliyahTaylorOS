@@ -38,9 +38,11 @@ module TSOS {
         public cycle(): void {
             _Kernel.krnTrace('CPU cycle');
             // TODO: Accumulate CPU usage and profiling statistics here.
+            TSOS.Control.updateMemTable();
             // Do the real work here. Be sure to set this.isExecuting appropriately.
 
-            switch (this.opCode) {
+
+            /*switch (this.opCode) {
                 case "A9": //Load the accumulator with a constant
                     this.loadAccCon();
                     break;
@@ -86,9 +88,9 @@ module TSOS {
                 default:
                     this.sysBreak();
                     this.isExecuting = false;
-                    break;
+                    break;} */
 
-            }
+
         }
         //The below has a lot of PC++ to increment PC every single time we read/write an opCode
         private loadAccCon(){
@@ -110,7 +112,9 @@ module TSOS {
             this.PC++
             var addr = parseInt(_MemManager.readMem(this.currPCB, this.PC), 16);
             this.PC++
-            _MemManager.writeMem(this.currPCB, addr, this.Acc.toString(16));
+            _MemManager.writeMem(
+               // this.currPCB,
+                addr, this.Acc.toString(16));
             this.PC++
         }
         private addWithCarry(){
@@ -173,7 +177,9 @@ module TSOS {
             this.PC++;
             var val = parseInt(_MemManager.readMem(this.currPCB, addr), 16);
             val++;
-            _MemManager.writeMem(this.currPCB, addr, val.toString(16));
+            _MemManager.writeMem(
+                //this.currPCB,
+                addr, val.toString(16));
             this.PC++;
         }
         private sysCall(){

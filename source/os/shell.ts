@@ -334,8 +334,7 @@ module TSOS {
                 // Requires Utils.ts for rot13() function.
                 _StdOut.putText(args.join(' ') + " = '" + Utils.rot13(args.join(' ')) +"'");
             } else {
-                _StdOut.putText("Usage: rot13 <string>  Please supply a string.");
-            }
+         }
         }
 
         public shellPrompt(args) {
@@ -397,6 +396,7 @@ module TSOS {
                 _StdOut.putText("Error. Program too large.");
             }
             else {
+
                 //set up a regular expression to test the user input against
                 var hexTest = new RegExp(/^[A-Fa-f0-9\s]+$/);
                 //see if user input matches the regular expression
@@ -410,13 +410,15 @@ module TSOS {
                     }
                     var ind = progString.split('');
                     var opCodes = [];
-                    //increment by 2 to get both hex digits
-                    for  (var i = 0; i< ind.length; i+=2){
-                        opCodes.push(ind[i] + ind[i+1]);
+
+                    for  (var i = 0; i< ind.length; i++){
+                        _MemManager.writeMem(i, ind[i]);
                     }
+                    var PID = _MemManager.currPID[_MemManager.currPID.length-1];
 
-                    _StdOut.putText('Loaded Process');
-
+                    _StdOut.putText("Loaded PID " + PID);
+                    //Increment the PID so that the next program has a different PID
+                    _MemManager.incPID();
                 }
                 else {
                     //Error if program has non-hex digits.

@@ -33,7 +33,7 @@ module TSOS {
             var htmlString = '';
 
             // For each row in the Memory table, generate column and populate with 0s
-            for(var i = 0; i < 256; i += 8){
+            for(var i = 0; i < 768; i += 8){
                 var iStr = i.toString();
                 if(i < 10){
                     iStr = '0' + iStr;
@@ -50,9 +50,9 @@ module TSOS {
             var display = document.getElementById('MemTable');
             var htmlString = '';
             var mem: string = _Memory.toString();
-            var memArr = mem.split(' ');
+            var memArr = mem.split('');
             var loc = 0;
-            for(var i = 0; i < 256; i += 8){
+            for(var i = 0; i < 768; i += 8){
                 var iStr = i.toString();
                 if(i < 10){
                     iStr = '0' + iStr;
@@ -140,18 +140,22 @@ module TSOS {
 
             // .. set focus on the OS console display ...
             document.getElementById("display").focus();
-            // ... Create and initialize the CPU (and Memory) (because it's part of the hardware)  ...
+            // ... Create and initialize the CPU and Memory (because it's part of the hardware)  ...
             _CPU = new Cpu();  // Note: We could simulate multi-core systems by instantiating more than one instance of the CPU here.
             _CPU.init();       //       There's more to do, like dealing with scheduling and such, but this would be a start. Pretty cool.
-           // I WANT to initialize the memory here, but that breaks everything.
-            /* Really though, why is this broken?
-              _Memory = new Memory(256);
-              _Memory.init(); */
+            _Memory = new Memory();
+            _Memory.init();
+            _MemManager = new MemManager();
+            _PCB = new Pcb();
+
             // ... then set the host clock pulse ...
             _hardwareClockID = setInterval(Devices.hostClockPulse, CPU_CLOCK_INTERVAL);
             // .. and call the OS Kernel Bootstrap routine.
             _Kernel = new Kernel();
             _Kernel.krnBootstrap();  // _GLaDOS.afterStartup() will get called in there, if configured.
+
+
+
         }
 
         public static hostBtnHaltOS_click(btn): void {

@@ -1,14 +1,13 @@
 var TSOS;
 (function (TSOS) {
     var Memory = /** @class */ (function () {
-        function Memory(size) {
-            this.size = size;
-            this.memory = [];
-            this.memory = new Array(size);
+        function Memory(memory) {
+            if (memory === void 0) { memory = []; }
+            this.memory = memory;
         }
         Memory.prototype.init = function () {
-            for (var i = 0; i < this.memory.length; i++) {
-                this.memory[i] = '00';
+            for (var i = 0; i < 768; i++) {
+                this.memory.push(0);
             }
         };
         Memory.prototype.setOp = function (loc, code) {

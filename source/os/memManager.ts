@@ -1,40 +1,28 @@
-///<reference path="../globals.ts" />
-///<reference path="../os/pcb.ts" />
-///<reference path="../host/memory.ts" />
 module TSOS {
     export class MemManager {
-        constructor() {}
-        public init() : void{
+        constructor(public currPID = [0]){
         }
+        public incPID() {
+            var n = this.currPID.length;
+            this.currPID.push(n);
 
-        public load(program) {
-        //create a new pcb
-           /* var pcb = new TSOS.Pcb();
-           for (var i = 0; i < 256; i++){
-               if (i > 256){
-                   break;
-               }
-            _Memory.setOp(i, program[i]);
-           }*/
-          var pID = 0;
-            return pID;
-        }
+       //Create a new PCB and load op codes into memory
 
-        public setProgram(code) {
-            var opArr = code.split(' ');
 
-            for (var i = 0; i < opArr.length; i++) {
-                var opCode = opArr[i];
-                _Memory[i] = opCode;
+          /*  for ( let i = 0; i < 255; i++){
+                let opCode = '';
+            if(program[i] === undefined){
+                opCode = '00'
+            } else {
+                opCode = program[i].toString();
             }
-            Control.updateMemTable();
-
+            _Memory.setOp(i, opCode);}}*/
         }
 
       public readMem(PCB, loc){
             return _Memory.getOp(loc);
         }
-        public writeMem(PCB, loc, code){
+        public writeMem(loc, code){
             _Memory.setOp(loc, code);
         }
     }
