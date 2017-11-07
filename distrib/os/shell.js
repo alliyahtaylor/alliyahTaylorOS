@@ -63,6 +63,8 @@ var TSOS;
             this.commandList[this.commandList.length] = sc;
             sc = new TSOS.ShellCommand(this.shellRun, "run", "- Runs the program specified by user.");
             this.commandList[this.commandList.length] = sc;
+            sc = new TSOS.ShellCommand(this.shellClearMem, "clearmem", "- Clears the entire memory.");
+            this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
             //
@@ -366,18 +368,22 @@ var TSOS;
                 }
                 else {
                     //Error if program has non-hex digits.
-                    _StdOut.putText("Invalid program, non-hex digits.");
+                    _StdOut.putText('Invalid program, non-hex digits.');
                 }
             }
         };
         Shell.prototype.shellRun = function (args) {
             if (args.length === 0) {
-                _StdOut.putText("Please provide a PID");
+                _StdOut.putText('Please provide a PID');
             }
             else {
                 var PID = parseInt(args[0]);
                 _CPU.runProc(PID);
             }
+        };
+        Shell.prototype.shellClearMem = function () {
+            _MemManager.eraseAll();
+            _StdOut.putText('Memory Cleared.');
         };
         return Shell;
     }());

@@ -20,8 +20,10 @@ var TSOS;
             //Find an available partition in memory
             var part = this.availPart();
             this.memParts[part] = PCB.Pid;
+            //account for which memory partition PCB is located in
             PCB.Base = part * 256;
             PCB.Limit = part + 255;
+            //Write op codes to memory
             for (var i = 0; i < 256; i++) {
                 var opCode = '';
                 if (program[i] === undefined) {
@@ -34,10 +36,10 @@ var TSOS;
             }
         };
         MemManager.prototype.readMem = function (PCB, loc) {
-            return _Memory.getOp(loc);
+            return _Memory.getOp(PCB.Base + loc);
         };
         MemManager.prototype.writeMem = function (PCB, loc, code) {
-            _Memory.setOp(loc, code);
+            _Memory.setOp(PCB.Base + loc, code);
         };
         MemManager.prototype.getPCB = function (PID) {
             return _PCBArr[PID];
@@ -78,6 +80,8 @@ var TSOS;
         //Clear all memory partitions
         MemManager.prototype.eraseAll = function () {
             _Memory.init();
+            this.memParts = [-1, -1, -1];
+            this.executed.push(this.PIDList);
         };
         return MemManager;
     }());

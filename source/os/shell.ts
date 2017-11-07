@@ -112,6 +112,10 @@ module TSOS {
                 "run",
                 "- Runs the program specified by user.")
             this.commandList[this.commandList.length] = sc;
+            sc = new ShellCommand (this.shellClearMem,
+                "clearmem",
+                "- Clears the entire memory.")
+            this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
 
@@ -432,18 +436,22 @@ module TSOS {
                 }
                 else {
                     //Error if program has non-hex digits.
-                    _StdOut.putText("Invalid program, non-hex digits.");
+                    _StdOut.putText('Invalid program, non-hex digits.');
                 }
             }
         }
 
         public shellRun(args){
             if(args.length === 0){
-                _StdOut.putText("Please provide a PID")
+                _StdOut.putText('Please provide a PID')
             }else{
                 var PID = parseInt(args[0]);
                 _CPU.runProc(PID);
             }
-    }
+        }
+        public shellClearMem(){
+            _MemManager.eraseAll();
+        }
+
     }
 }

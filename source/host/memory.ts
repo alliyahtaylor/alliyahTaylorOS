@@ -4,8 +4,9 @@ module TSOS{
 
         public init(): void{
             for (var i = 0; i < 768; i++){
-                this.memory.push(0);
+                this.setOp(i, '00');
             }
+            TSOS.Control.updateMemTable();
         }
         public setOp(loc, code){
             this.memory[loc] = code;

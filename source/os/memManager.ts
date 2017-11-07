@@ -14,9 +14,10 @@ module TSOS {
             //Find an available partition in memory
             var part = this.availPart();
             this.memParts[part] = PCB.Pid;
+            //account for which memory partition PCB is located in
             PCB.Base = part * 256;
             PCB.Limit = part + 255;
-
+            //Write op codes to memory
             for(var i = 0; i < 256; i++){
               var opCode ='';
                if (program[i] === undefined){
@@ -69,6 +70,8 @@ module TSOS {
         //Clear all memory partitions
         public eraseAll(){
             _Memory.init();
+            this.memParts = [-1, -1, -1];
+            this.executed.push(this.PIDList);
         }
     }
 }
