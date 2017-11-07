@@ -16,7 +16,7 @@
 var TSOS;
 (function (TSOS) {
     var Cpu = /** @class */ (function () {
-        function Cpu(PC, Acc, Xreg, Yreg, Zflag, currPCB, isExecuting, opCode) {
+        function Cpu(PC, Acc, Xreg, Yreg, Zflag, currPCB, isExecuting, IR) {
             if (PC === void 0) { PC = 0; }
             if (Acc === void 0) { Acc = 0; }
             if (Xreg === void 0) { Xreg = 0; }
@@ -24,7 +24,7 @@ var TSOS;
             if (Zflag === void 0) { Zflag = 0; }
             if (currPCB === void 0) { currPCB = null; }
             if (isExecuting === void 0) { isExecuting = false; }
-            if (opCode === void 0) { opCode = ' '; }
+            if (IR === void 0) { IR = ''; }
             this.PC = PC;
             this.Acc = Acc;
             this.Xreg = Xreg;
@@ -32,72 +32,79 @@ var TSOS;
             this.Zflag = Zflag;
             this.currPCB = currPCB;
             this.isExecuting = isExecuting;
-            this.opCode = opCode;
+            this.IR = IR;
         }
-        Cpu.prototype.init = function () {
-            //there was stuff in here, but it ended up breaking everything
-            //so don't do that
-        };
+        Cpu.prototype.init = function () { };
         Cpu.prototype.cycle = function () {
             _Kernel.krnTrace('CPU cycle');
             // TODO: Accumulate CPU usage and profiling statistics here.
-            TSOS.Control.updateMemTable();
             // Do the real work here. Be sure to set this.isExecuting appropriately.
-            /*switch (this.opCode) {
-                case "A9": //Load the accumulator with a constant
+            this.IR = _MemManager.readMem(this.currPCB, this.PC);
+            switch (this.IR) {
+                case "A9"://Load the accumulator with a constant
                     this.loadAccCon();
                     break;
-                case "AD": //Load the accumulator from memory
+                case "AD"://Load the accumulator from memory
                     this.loadAccMem();
                     break;
-                case "8D": //Store the accumulator in memory
+                case "8D"://Store the accumulator in memory
                     this.storeAccMem();
                     break;
-                case "6D": //Add with carry
+                case "6D"://Add with carry
                     this.addWithCarry();
                     break;
-                case "A2": // Load the X reg with a constant
+                case "A2":// Load the X reg with a constant
                     this.loadXCon();
                     break;
-                case "AE": // Load the X reg from memory
+                case "AE":// Load the X reg from memory
                     this.loadXMem();
                     break;
-                case "A0": // Load the Y reg with a constant
+                case "A0":// Load the Y reg with a constant
                     this.loadYCon();
                     break;
-                case "AC": // Load the Y reg from memory
+                case "AC":// Load the Y reg from memory
                     this.loadYMem();
                     break;
-                case "EA": //No Operation
+                case "EA"://No Operation
                     this.PC++;
                     break;
-                case "00": //Break, actually system call
+                case "00"://Break, actually system call
                     this.sysBreak();
                     break;
-                case "EC": //Compare byte in mem to x reg, set z flag if equal
+                case "EC"://Compare byte in mem to x reg, set z flag if equal
                     this.compareX();
                     break;
-                case "D0": // Branch n bytes if z flag = 0
+                case "D0":// Branch n bytes if z flag = 0
                     this.branch();
                     break;
-                case "EE": //Increment the value of a byte
+                case "EE"://Increment the value of a byte
                     this.incrementByte();
                     break;
-                case "FF": //System call
+                case "FF"://System call
+                    _KernelInterruptQueue.enqueue(new TSOS.Interrupt(SYSTEM_CALL_IRQ, ''));
                     this.sysCall();
                     break;
                 default:
-                    this.sysBreak();
                     this.isExecuting = false;
-                    break;} */
+                    break;
+            }
+            this.PC = this.PC % 256;
+            this.updatePCB();
+            TSOS.Control.updateMemTable();
         };
-        //The below has a lot of PC++ to increment PC every single time we read/write an opCode
+        Cpu.prototype.runProc = function (PID) {
+            this.currPCB = _MemManager.getPCB(PID);
+            this.loadFromPCB();
+            this.isExecuting = true;
+        };
+        Cpu.prototype.loadProc = function (PCB) {
+            this.currPCB = PCB;
+            this.loadFromPCB();
+        };
+        //Op Code Programs
         Cpu.prototype.loadAccCon = function () {
-            //increment PC for the instruction you just read.
             this.PC++;
-            //Load the accumulator
             this.Acc = parseInt(_MemManager.readMem(this.currPCB, this.PC), 16);
-            //Increment PC for THAT instruction too
             this.PC++;
         };
         Cpu.prototype.loadAccMem = function () {
@@ -111,9 +118,7 @@ var TSOS;
             this.PC++;
             var addr = parseInt(_MemManager.readMem(this.currPCB, this.PC), 16);
             this.PC++;
-            _MemManager.writeMem(
-            // this.currPCB,
-            addr, this.Acc.toString(16));
+            _MemManager.writeMem(this.currPCB, addr, this.Acc.toString(16));
             this.PC++;
         };
         Cpu.prototype.addWithCarry = function () {
@@ -177,15 +182,55 @@ var TSOS;
             this.PC++;
             var val = parseInt(_MemManager.readMem(this.currPCB, addr), 16);
             val++;
-            _MemManager.writeMem(
-            //this.currPCB,
-            addr, val.toString(16));
+            _MemManager.writeMem(this.currPCB, addr, val.toString(16));
             this.PC++;
         };
         Cpu.prototype.sysCall = function () {
+            // if 1 in X register, print byte in Y register
+            // else if 2 in X register, print 00 terminated string at addr stored in Y register
+            if (this.Xreg === 1) {
+                var str = this.Yreg.toString();
+            }
+            else {
+                var output = '';
+                var addr = this.Yreg;
+                var code = _MemManager.readMem(this.currPCB, addr);
+                while (code !== '00') {
+                    var letter = String.fromCharCode(parseInt(code, 16));
+                    output += letter;
+                    addr++;
+                    var code = _MemManager.readMem(this.currPCB, addr);
+                }
+                var str = output;
+            }
+            _StdOut.putText(str);
+            this.PC++;
         };
         Cpu.prototype.sysBreak = function () {
+            this.updatePCB();
+            this.clearPCB();
+            //ClearMem
+            //Array of Executed programs
             this.isExecuting = false;
+        };
+        Cpu.prototype.clearPCB = function () {
+            this.currPCB = null;
+            this.Acc = 0;
+            this.Xreg = 0;
+            this.Yreg = 0;
+            this.Zflag = 0;
+            this.PC = 0;
+        };
+        Cpu.prototype.loadFromPCB = function () {
+            this.PC = this.currPCB.PC;
+            this.Acc = this.currPCB.Acc;
+            this.Xreg = this.currPCB.Xreg;
+            this.Yreg = this.currPCB.Yreg;
+            this.Zflag = this.currPCB.Zflag;
+        };
+        Cpu.prototype.updatePCB = function () {
+            this.currPCB.update(this.PC, this.Acc, this.Xreg, this.Yreg, this.Zflag);
+            TSOS.Control.updateProcTable(this.currPCB, this.IR);
         };
         return Cpu;
     }());

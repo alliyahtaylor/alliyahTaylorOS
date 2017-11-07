@@ -26,23 +26,17 @@ module TSOS {
                     public Zflag: number = 0,
                     public currPCB: TSOS.Pcb = null,
                     public isExecuting: boolean = false,
-                    public opCode: string = ' ') {
+                    public IR: string = '') {
 
         }
-
-        public init(): void {
-            //there was stuff in here, but it ended up breaking everything
-            //so don't do that
-            }
+        public init(): void {}
 
         public cycle(): void {
             _Kernel.krnTrace('CPU cycle');
             // TODO: Accumulate CPU usage and profiling statistics here.
-            TSOS.Control.updateMemTable();
             // Do the real work here. Be sure to set this.isExecuting appropriately.
-
-
-            /*switch (this.opCode) {
+            this.IR = _MemManager.readMem(this.currPCB, this.PC);
+            switch (this.IR) {
                 case "A9": //Load the accumulator with a constant
                     this.loadAccCon();
                     break;
@@ -83,27 +77,36 @@ module TSOS {
                     this.incrementByte();
                     break;
                 case "FF": //System call
+                    _KernelInterruptQueue.enqueue(new Interrupt (SYSTEM_CALL_IRQ, ''));
                     this.sysCall();
                     break;
                 default:
-                    this.sysBreak();
                     this.isExecuting = false;
-                    break;} */
-
-
+                    break;}
+            this.PC = this.PC % 256;
+            this.updatePCB();
+            TSOS.Control.updateMemTable();
         }
-        //The below has a lot of PC++ to increment PC every single time we read/write an opCode
+        public runProc(PID){
+            this.currPCB = _MemManager.getPCB(PID);
+            this.loadFromPCB();
+            this.isExecuting = true;
+        }
+
+        public loadProc(PCB){
+            this.currPCB = PCB;
+            this.loadFromPCB();
+        }
+
+        //Op Code Programs
         private loadAccCon(){
-            //increment PC for the instruction you just read.
             this.PC++;
-            //Load the accumulator
-            this.Acc = parseInt(_MemManager.readMem(this.currPCB, this.PC),16);
-            //Increment PC for THAT instruction too
+            this.Acc = parseInt(_MemManager.readMem(this.currPCB, this.PC), 16);
             this.PC++;
         }
         private loadAccMem(){
             this.PC++;
-            var addr = parseInt (_MemManager.readMem(this.currPCB, this.PC), 16);
+            var addr = parseInt(_MemManager.readMem(this.currPCB, this.PC), 16);
             this.PC++
             this.Acc = parseInt(_MemManager.readMem(this.currPCB, addr), 16)
             this.PC++;
@@ -112,9 +115,7 @@ module TSOS {
             this.PC++
             var addr = parseInt(_MemManager.readMem(this.currPCB, this.PC), 16);
             this.PC++
-            _MemManager.writeMem(
-               // this.currPCB,
-                addr, this.Acc.toString(16));
+            _MemManager.writeMem(this.currPCB, addr, this.Acc.toString(16));
             this.PC++
         }
         private addWithCarry(){
@@ -165,7 +166,7 @@ module TSOS {
                 var hex = _MemManager.readMem(this.currPCB, this.PC);
                 this.PC++;
                 var br = parseInt(hex, 16);
-                this.PC+= br; //jump forward in instructions instead of just inc to next one
+                this.PC += br; //jump forward in instructions instead of just inc to next one
             } else{
                 this.PC++ //otherwise increment as normal to account for the instruction
             }
@@ -177,16 +178,57 @@ module TSOS {
             this.PC++;
             var val = parseInt(_MemManager.readMem(this.currPCB, addr), 16);
             val++;
-            _MemManager.writeMem(
-                //this.currPCB,
-                addr, val.toString(16));
+            _MemManager.writeMem(this.currPCB, addr, val.toString(16));
             this.PC++;
         }
         private sysCall(){
-
+            // if 1 in X register, print byte in Y register
+            // else if 2 in X register, print 00 terminated string at addr stored in Y register
+            if (this.Xreg === 1){
+                var str = this.Yreg.toString();
+            } else {
+                var output = '';
+                var addr = this.Yreg;
+                var code = _MemManager.readMem(this.currPCB, addr);
+                while(code !== '00'){
+                    var letter = String.fromCharCode(parseInt(code,16));
+                    output += letter;
+                    addr++;
+                    var code = _MemManager.readMem(this.currPCB, addr);
+                }
+                var str = output;
+            }
+           _StdOut.putText(str);
+            this.PC++;
         }
         private sysBreak(){
+            this.updatePCB();
+            this.clearPCB();
+            //ClearMem
+            //Array of Executed programs
             this.isExecuting = false;
+        }
+
+        private clearPCB(){
+
+            this.currPCB = null;
+            this.Acc = 0;
+            this.Xreg = 0;
+            this.Yreg = 0;
+            this.Zflag = 0;
+            this.PC = 0;
+        }
+
+        private loadFromPCB(){
+            this.PC = this.currPCB.PC;
+            this.Acc = this.currPCB.Acc;
+            this.Xreg = this.currPCB.Xreg;
+            this.Yreg = this.currPCB.Yreg;
+            this.Zflag = this.currPCB.Zflag;}
+
+        public updatePCB() {
+            this.currPCB.update(this.PC, this.Acc, this.Xreg, this.Yreg, this.Zflag);
+            TSOS.Control.updateProcTable(this.currPCB, this.IR);
         }
     }
 }

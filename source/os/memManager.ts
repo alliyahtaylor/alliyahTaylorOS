@@ -1,29 +1,74 @@
 module TSOS {
     export class MemManager {
-        constructor(public currPID = [0]){
+        constructor( ///Initialize ALL the arrays
+                    public PIDList = [0], //List of loaded PIDs
+                    public memParts = [-1,-1,-1], //Memory Partitions
+                    public executed = []){     //PIDs we ran already
         }
         public incPID() {
-            var n = this.currPID.length;
-            this.currPID.push(n);
+            var n = this.PIDList.length;
+            this.PIDList.push(n);
 
-       //Create a new PCB and load op codes into memory
+        }
+        public load(PCB, program){
+            //Find an available partition in memory
+            var part = this.availPart();
+            this.memParts[part] = PCB.Pid;
+            PCB.Base = part * 256;
+            PCB.Limit = part + 255;
 
-
-          /*  for ( let i = 0; i < 255; i++){
-                let opCode = '';
-            if(program[i] === undefined){
-                opCode = '00'
-            } else {
-                opCode = program[i].toString();
+            for(var i = 0; i < 256; i++){
+              var opCode ='';
+               if (program[i] === undefined){
+                   opCode = '00';
+               }else{
+                   opCode = program[i];
+               }
+                _Memory.setOp(PCB.Base +i, opCode);
             }
-            _Memory.setOp(i, opCode);}}*/
+            }
+
+        public readMem(PCB, loc){
+            return _Memory.getOp(PCB.Base + loc);
+        }
+        public writeMem(PCB, loc, code){
+            _Memory.setOp(PCB.Base + loc, code);
         }
 
-      public readMem(PCB, loc){
-            return _Memory.getOp(loc);
+        public getPCB(PID){
+            return _PCBArr[PID];
         }
-        public writeMem(loc, code){
-            _Memory.setOp(loc, code);
+        //Find available partition
+        public availPart(){
+            if (this.memParts[0] === -1){
+                return 0;
+            } else if (this.memParts[1] === -1){
+                return 1;
+            } else if (this.memParts[2] === -1){
+                return 2;
+            } else{
+                return null;
+            }
+        }
+        //clear specific memory partition
+        public clearPart(PID) {
+            if (this.memParts.indexOf(PID) === 0) {
+                for (let i = 0; i < 256; i++) {
+                    _Memory.memory[i] = '00';
+                }
+            } else if (this.memParts.indexOf(PID) === 1) {
+                for (let i = 256; i < 512; i++) {
+                    _Memory.memory[i] = '00';
+                }
+            } else if (this.memParts.indexOf(PID) === 2) {
+                for (let i = 512; i < 768; i++) {
+                    _Memory.memory[i] = '00';
+                }
+            }
+        }
+        //Clear all memory partitions
+        public eraseAll(){
+            _Memory.init();
         }
     }
 }

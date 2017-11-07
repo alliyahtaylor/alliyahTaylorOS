@@ -106,9 +106,12 @@ module TSOS {
 
             sc = new ShellCommand (this.shellLoad,
                 "load",
-                "- Validates the user code." );
+                "- Loads program into memory." );
             this.commandList[this.commandList.length] = sc;
-
+            sc = new ShellCommand (this.shellRun,
+                "run",
+                "- Runs the program specified by user.")
+            this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
 
@@ -385,13 +388,19 @@ module TSOS {
         public shellLoad(args){ //THIS IS BROKEN AND STRESSING ME OUT SO FUCK IT FOR RIGHT NOW
             //Get the user input from the user program box
             var userProg = (<HTMLInputElement>document.getElementById("taProgramInput")).value;
-                //make sure there's actually a user input
+            //separate input into program aray
+            var progString = '';
+            var progArr = userProg.split(' ');
+            for (var i = 0; i < progArr.length; i++){
+                progString += progArr[i];
+            }
 
-            if (userProg.length < 1){
+            //make sure there's actually a user input
+            if (progArr.length < 1){
                _StdOut.putText("Please input a program.");
            }
            //Make sure the program doesn't go over max length
-           else if (userProg.length > 256){
+           else if (progArr.length > 256){
                 //Error if program is too large for memory.
                 _StdOut.putText("Error. Program too large.");
             }
@@ -401,24 +410,25 @@ module TSOS {
                 var hexTest = new RegExp(/^[A-Fa-f0-9\s]+$/);
                 //see if user input matches the regular expression
                 if (userProg.match(hexTest)) {
-                    //Loads program only if it exists, is the right side, and only has hex
-                    //get userProgram down to array of op codes.
-                    var progString = '';
-                    var progArr = userProg.split(' ');
-                    for (var i = 0; i < progArr.length; i++){
-                        progString += progArr[i];
-                    }
-                    var ind = progString.split('');
-                    var opCodes = [];
+                    //At this point we know that the program exists, only has hex digits, and isn't too big
 
-                    for  (var i = 0; i< ind.length; i++){
-                        _MemManager.writeMem(i, ind[i]);
-                    }
-                    var PID = _MemManager.currPID[_MemManager.currPID.length-1];
+                    //So check if there is space in memory
+                    if (_MemManager.availPart() != null){
+                    var PID = _MemManager.PIDList[_MemManager.PIDList.length-1];
+                    var newPCB = new Pcb();
+                    newPCB.init(PID);
+                    _PCBArr.push(newPCB);
+
+                    _MemManager.load(newPCB, progArr);
 
                     _StdOut.putText("Loaded PID " + PID);
                     //Increment the PID so that the next program has a different PID
                     _MemManager.incPID();
+                    //Update the mem table with the loaded program.
+                    TSOS.Control.updateMemTable();
+                    }else{
+                        _StdOut.putText('No memory available. Please clear memory');
+                    }
                 }
                 else {
                     //Error if program has non-hex digits.
@@ -427,5 +437,13 @@ module TSOS {
             }
         }
 
+        public shellRun(args){
+            if(args.length === 0){
+                _StdOut.putText("Please provide a PID")
+            }else{
+                var PID = parseInt(args[0]);
+                _CPU.runProc(PID);
+            }
+    }
     }
 }

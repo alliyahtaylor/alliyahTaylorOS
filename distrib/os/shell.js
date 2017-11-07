@@ -59,7 +59,9 @@ var TSOS;
             this.commandList[this.commandList.length] = sc;
             sc = new TSOS.ShellCommand(this.shellBSOD, "error", "- A test error.");
             this.commandList[this.commandList.length] = sc;
-            sc = new TSOS.ShellCommand(this.shellLoad, "load", "- Validates the user code.");
+            sc = new TSOS.ShellCommand(this.shellLoad, "load", "- Loads program into memory.");
+            this.commandList[this.commandList.length] = sc;
+            sc = new TSOS.ShellCommand(this.shellRun, "run", "- Runs the program specified by user.");
             this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
@@ -325,11 +327,17 @@ var TSOS;
         Shell.prototype.shellLoad = function (args) {
             //Get the user input from the user program box
             var userProg = document.getElementById("taProgramInput").value;
+            //separate input into program aray
+            var progString = '';
+            var progArr = userProg.split(' ');
+            for (var i = 0; i < progArr.length; i++) {
+                progString += progArr[i];
+            }
             //make sure there's actually a user input
-            if (userProg.length < 1) {
+            if (progArr.length < 1) {
                 _StdOut.putText("Please input a program.");
             }
-            else if (userProg.length > 256) {
+            else if (progArr.length > 256) {
                 //Error if program is too large for memory.
                 _StdOut.putText("Error. Program too large.");
             }
@@ -338,27 +346,37 @@ var TSOS;
                 var hexTest = new RegExp(/^[A-Fa-f0-9\s]+$/);
                 //see if user input matches the regular expression
                 if (userProg.match(hexTest)) {
-                    //Loads program only if it exists, is the right side, and only has hex
-                    //get userProgram down to array of op codes.
-                    var progString = '';
-                    var progArr = userProg.split(' ');
-                    for (var i = 0; i < progArr.length; i++) {
-                        progString += progArr[i];
+                    //At this point we know that the program exists, only has hex digits, and isn't too big
+                    //So check if there is space in memory
+                    if (_MemManager.availPart() != null) {
+                        var PID = _MemManager.PIDList[_MemManager.PIDList.length - 1];
+                        var newPCB = new TSOS.Pcb();
+                        newPCB.init(PID);
+                        _PCBArr.push(newPCB);
+                        _MemManager.load(newPCB, progArr);
+                        _StdOut.putText("Loaded PID " + PID);
+                        //Increment the PID so that the next program has a different PID
+                        _MemManager.incPID();
+                        //Update the mem table with the loaded program.
+                        TSOS.Control.updateMemTable();
                     }
-                    var ind = progString.split('');
-                    var opCodes = [];
-                    for (var i = 0; i < ind.length; i++) {
-                        _MemManager.writeMem(i, ind[i]);
+                    else {
+                        _StdOut.putText('No memory available. Please clear memory');
                     }
-                    var PID = _MemManager.currPID[_MemManager.currPID.length - 1];
-                    _StdOut.putText("Loaded PID " + PID);
-                    //Increment the PID so that the next program has a different PID
-                    _MemManager.incPID();
                 }
                 else {
                     //Error if program has non-hex digits.
                     _StdOut.putText("Invalid program, non-hex digits.");
                 }
+            }
+        };
+        Shell.prototype.shellRun = function (args) {
+            if (args.length === 0) {
+                _StdOut.putText("Please provide a PID");
+            }
+            else {
+                var PID = parseInt(args[0]);
+                _CPU.runProc(PID);
             }
         };
         return Shell;

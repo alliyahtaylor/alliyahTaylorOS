@@ -27,12 +27,11 @@ module TSOS {
 
     export class Control {
 
-        //Initialize memTable display
         public static memTable(): void {
             var display = document.getElementById('memTable');
             var htmlString = '';
 
-            // For each row in the Memory table, generate column and populate with 0s
+            // For each row in the table, generate each column
             for(var i = 0; i < 768; i += 8){
                 var iStr = i.toString();
                 if(i < 10){
@@ -46,12 +45,14 @@ module TSOS {
             }
             display.innerHTML = htmlString;
         }
-        public static updateMemTable(){
-            var display = document.getElementById('MemTable');
+
+        public static updateMemTable(): void {
+            var display = document.getElementById('memTable');
             var htmlString = '';
-            var mem: string = _Memory.toString();
-            var memArr = mem.split('');
-            var loc = 0;
+            var memArr = _Memory.memory;
+            var memPointer = 0;
+
+            // For each row in the table, generate each column
             for(var i = 0; i < 768; i += 8){
                 var iStr = i.toString();
                 if(i < 10){
@@ -60,10 +61,10 @@ module TSOS {
                 if(i < 100){
                     iStr = '0' + iStr;
                 }
-                htmlString += '<tr>' + '<th>0x' + iStr + '</th>' + '<th>' + memArr[loc++] + '</th>' + '<th>' + memArr[loc++];
-                htmlString += '</th>' + '<th>' + memArr[loc++] + '</th>' + '<th>' + memArr[loc++] + '</th>';
-                htmlString += '<th>' + memArr[loc++] + '</th>' + '<th>' + memArr[loc++] + '</th>' + '<th>' + memArr[loc++];
-                htmlString += '</th>' + '<th>' + memArr[loc++] + '</th>' + '</tr>' ;
+                htmlString += '<tr>' + '<th>0x' + iStr + '</th>' + '<th>' + memArr[memPointer++] + '</th>' + '<th>' + memArr[memPointer++];
+                htmlString += '</th>' + '<th>' + memArr[memPointer++] + '</th>' + '<th>' + memArr[memPointer++] + '</th>';
+                htmlString += '<th>' + memArr[memPointer++] + '</th>' + '<th>' + memArr[memPointer++] + '</th>' + '<th>' + memArr[memPointer++];
+                htmlString += '</th>' + '<th>' + memArr[memPointer++] + '</th>' + '</tr>' ;
             }
             display.innerHTML = htmlString;
         }
