@@ -41,7 +41,6 @@ var TSOS;
                 // TODO: Accumulate CPU usage and profiling statistics here.
                 // Do the real work here. Be sure to set this.isExecuting appropriately.
                 this.currPCB.State = 'Running';
-                _cpuScheduler.counter();
                 this.IR = _MemManager.readMem(this.currPCB, this.PC);
                 //Figure out what to do with each opCode.
                 switch (this.IR) {
@@ -88,14 +87,14 @@ var TSOS;
                         this.sysCall();
                         break;
                     default:
-                        this.isExecuting = false;
+                        this.sysBreak();
                         break;
                 }
                 this.PC = this.PC % 256;
                 //Keep PCB up to date
                 this.updatePCB();
                 TSOS.Control.updateMemTable();
-                if (!_cpuScheduler.readyQueue.isEmpty()) {
+                if (!_cpuScheduler.readyQueue.isEmpty() && _cpuScheduler.readyQueue.q.length != 1) {
                     _cpuScheduler.counter();
                 }
             }

@@ -67,6 +67,12 @@ var TSOS;
             this.commandList[this.commandList.length] = sc;
             sc = new TSOS.ShellCommand(this.shellRunAll, "runall", "- Runs all programs in memory.");
             this.commandList[this.commandList.length] = sc;
+            sc = new TSOS.ShellCommand(this.shellQuantum, "quantum", "- Changes the quantum for round robin scheduling.");
+            this.commandList[this.commandList.length] = sc;
+            sc = new TSOS.ShellCommand(this.shellPS, "ps", "- Shows all running processes.");
+            this.commandList[this.commandList.length] = sc;
+            sc = new TSOS.ShellCommand(this.shellKill, "kill", "- kills a process..");
+            this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
             //
@@ -392,6 +398,38 @@ var TSOS;
             for (var i = 0; i < length; i++) {
                 _cpuScheduler.loadQueue();
                 _CPU.isExecuting = true;
+            }
+        };
+        Shell.prototype.shellQuantum = function (args) {
+            //Make sure the user provides a number for the quantum
+            if (args.length === 0) {
+                _StdOut.putText('Please provide a number for the quantum');
+                //Make sure the user actually provides a number, not something stupid
+            }
+            else if (isNaN(args)) {
+                _StdOut.putText('The quantum must be a number.');
+            }
+            else {
+                _cpuScheduler.quantum = parseInt(args);
+                _StdOut.putText('Quantum successfully set to ' + args);
+            }
+        };
+        Shell.prototype.shellPS = function () {
+            _StdOut.putText('Active Processes:');
+        };
+        Shell.prototype.shellKill = function (args) {
+            if (args.length === 0) {
+                _StdOut.putText('Please provide a PID');
+                //Make sure the user actually provides a number, not something stupid
+            }
+            else if (isNaN(args)) {
+                _StdOut.putText('The PID must be a number.');
+            }
+            else {
+                var PID = parseInt(args);
+                _MemManager.clearPart(PID);
+                var PCB = _PCBArr[PID];
+                PCB.State = 'Terminated';
             }
         };
         return Shell;

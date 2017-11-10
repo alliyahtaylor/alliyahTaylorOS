@@ -36,8 +36,6 @@ module TSOS {
                 // Do the real work here. Be sure to set this.isExecuting appropriately.
 
                 this.currPCB.State = 'Running';
-
-                _cpuScheduler.counter();
                 this.IR = _MemManager.readMem(this.currPCB, this.PC);
 
                 //Figure out what to do with each opCode.
@@ -85,7 +83,7 @@ module TSOS {
                         this.sysCall();
                         break;
                     default:
-                        this.isExecuting = false;
+                       this.sysBreak();
                         break;
                 }
                 this.PC = this.PC % 256;
@@ -93,7 +91,7 @@ module TSOS {
                 this.updatePCB();
                 TSOS.Control.updateMemTable();
 
-                if(!_cpuScheduler.readyQueue.isEmpty()){
+                if(!_cpuScheduler.readyQueue.isEmpty() && _cpuScheduler.readyQueue.q.length != 1){
                     _cpuScheduler.counter();
                 }
             }} //end cycle
@@ -234,7 +232,7 @@ module TSOS {
             this.PC = 0;
         }
 
-        private loadFromPCB(){
+        public loadFromPCB(){
             this.PC = this.currPCB.PC;
             this.Acc = this.currPCB.Acc;
             this.Xreg = this.currPCB.Xreg;
