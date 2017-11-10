@@ -25,6 +25,8 @@ const KEYBOARD_IRQ: number = 1;
 
 const SYSTEM_CALL_IRQ: number = 2;
 
+const CON_SWITCH_IRQ: number = 3;
+
 
 //
 // Global Variables
@@ -33,6 +35,7 @@ const SYSTEM_CALL_IRQ: number = 2;
 var _CPU: TSOS.Cpu;  // Utilize TypeScript's type annotation system to ensure that _CPU is an instance of the Cpu class.
 var _Memory: TSOS.Memory;
 var _MemManager: TSOS.MemManager;
+var _cpuScheduler: TSOS.cpuScheduler;
 var _PCB: TSOS.Pcb;
 var _PCBArr = [];
 

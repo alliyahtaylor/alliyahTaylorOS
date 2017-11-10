@@ -21,11 +21,9 @@ var TSOS;
             this.Limit = Limit;
             this.State = State;
         }
-        //TODO Fix this awful Base/Limit thing you have going on wtf
         Pcb.prototype.init = function (pID) {
             this.pID = pID;
-            this.Limit = 768 / pID + 1;
-            this.Base = this.Limit - 256;
+            this.State = 'New';
         };
         Pcb.prototype.update = function (PC, Acc, XReg, YReg, Zflag) {
             this.PC = PC;

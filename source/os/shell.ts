@@ -116,6 +116,10 @@ module TSOS {
                 "clearmem",
                 "- Clears the entire memory.")
             this.commandList[this.commandList.length] = sc;
+            sc = new ShellCommand (this.shellRunAll,
+                "runall",
+                "- Runs all programs in memory.")
+            this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
 
@@ -415,7 +419,6 @@ module TSOS {
                 //see if user input matches the regular expression
                 if (userProg.match(hexTest)) {
                     //At this point we know that the program exists, only has hex digits, and isn't too big
-
                     //So check if there is space in memory
                     if (_MemManager.availPart() != null){
                     var PID = _MemManager.PIDList[_MemManager.PIDList.length-1];
@@ -446,11 +449,20 @@ module TSOS {
                 _StdOut.putText('Please provide a PID')
             }else{
                 var PID = parseInt(args[0]);
+                _cpuScheduler.addQueue(_PCBArr[PID]);
                 _CPU.runProc(PID);
             }
         }
         public shellClearMem(){
             _MemManager.eraseAll();
+        }
+
+        public shellRunAll(){
+           var length = _PCBArr.length;
+        for(var i = 0; i< length; i++){
+            _cpuScheduler.loadQueue();
+            _CPU.isExecuting = true;
+        }
         }
 
     }

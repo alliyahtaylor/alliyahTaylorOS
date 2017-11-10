@@ -65,6 +65,8 @@ var TSOS;
             this.commandList[this.commandList.length] = sc;
             sc = new TSOS.ShellCommand(this.shellClearMem, "clearmem", "- Clears the entire memory.");
             this.commandList[this.commandList.length] = sc;
+            sc = new TSOS.ShellCommand(this.shellRunAll, "runall", "- Runs all programs in memory.");
+            this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
             //
@@ -378,12 +380,19 @@ var TSOS;
             }
             else {
                 var PID = parseInt(args[0]);
+                _cpuScheduler.addQueue(_PCBArr[PID]);
                 _CPU.runProc(PID);
             }
         };
         Shell.prototype.shellClearMem = function () {
             _MemManager.eraseAll();
-            _StdOut.putText('Memory Cleared.');
+        };
+        Shell.prototype.shellRunAll = function () {
+            var length = _PCBArr.length;
+            for (var i = 0; i < length; i++) {
+                _cpuScheduler.loadQueue();
+                _CPU.isExecuting = true;
+            }
         };
         return Shell;
     }());

@@ -26,75 +26,88 @@ module TSOS {
                     public Zflag: number = 0,
                     public currPCB: TSOS.Pcb = null,
                     public isExecuting: boolean = false,
-                    public IR: string = '') {
-
-        }
+                    public IR: string = '') {}
         public init(): void {}
 
         public cycle(): void {
-            _Kernel.krnTrace('CPU cycle');
-            // TODO: Accumulate CPU usage and profiling statistics here.
-            // Do the real work here. Be sure to set this.isExecuting appropriately.
-            this.IR = _MemManager.readMem(this.currPCB, this.PC);
-            switch (this.IR) {
-                case "A9": //Load the accumulator with a constant
-                    this.loadAccCon();
-                    break;
-                case "AD": //Load the accumulator from memory
-                    this.loadAccMem();
-                    break;
-                case "8D": //Store the accumulator in memory
-                    this.storeAccMem();
-                    break;
-                case "6D": //Add with carry
-                    this.addWithCarry();
-                    break;
-                case "A2": // Load the X reg with a constant
-                    this.loadXCon();
-                    break;
-                case "AE": // Load the X reg from memory
-                    this.loadXMem();
-                    break;
-                case "A0": // Load the Y reg with a constant
-                    this.loadYCon();
-                    break;
-                case "AC": // Load the Y reg from memory
-                    this.loadYMem();
-                    break;
-                case "EA": //No Operation
-                    this.PC++;
-                    break;
-                case "00": //Break, actually system call
-                    this.sysBreak();
-                    break;
-                case "EC": //Compare byte in mem to x reg, set z flag if equal
-                    this.compareX();
-                    break;
-                case "D0": // Branch n bytes if z flag = 0
-                    this.branch();
-                    break;
-                case "EE": //Increment the value of a byte
-                    this.incrementByte();
-                    break;
-                case "FF": //System call
-                    _KernelInterruptQueue.enqueue(new Interrupt (SYSTEM_CALL_IRQ, ''));
-                    this.sysCall();
-                    break;
-                default:
-                    this.isExecuting = false;
-                    break;}
-            this.PC = this.PC % 256;
-            this.updatePCB();
-            TSOS.Control.updateMemTable();
-        }
+            if(this.currPCB !== null && this.isExecuting) {
+                _Kernel.krnTrace('CPU cycle');
+                // TODO: Accumulate CPU usage and profiling statistics here.
+                // Do the real work here. Be sure to set this.isExecuting appropriately.
+
+                this.currPCB.State = 'Running';
+
+                _cpuScheduler.counter();
+                this.IR = _MemManager.readMem(this.currPCB, this.PC);
+
+                //Figure out what to do with each opCode.
+                switch (this.IR) {
+                    case "A9": //Load the accumulator with a constant
+                        this.loadAccCon();
+                        break;
+                    case "AD": //Load the accumulator from memory
+                        this.loadAccMem();
+                        break;
+                    case "8D": //Store the accumulator in memory
+                        this.storeAccMem();
+                        break;
+                    case "6D": //Add with carry
+                        this.addWithCarry();
+                        break;
+                    case "A2": // Load the X reg with a constant
+                        this.loadXCon();
+                        break;
+                    case "AE": // Load the X reg from memory
+                        this.loadXMem();
+                        break;
+                    case "A0": // Load the Y reg with a constant
+                        this.loadYCon();
+                        break;
+                    case "AC": // Load the Y reg from memory
+                        this.loadYMem();
+                        break;
+                    case "EA": //No Operation
+                        this.PC++;
+                        break;
+                    case "00": //Break, actually system call
+                        this.sysBreak();
+                        break;
+                    case "EC": //Compare byte in mem to x reg, set z flag if equal
+                        this.compareX();
+                        break;
+                    case "D0": // Branch n bytes if z flag = 0
+                        this.branch();
+                        break;
+                    case "EE": //Increment the value of a byte
+                        this.incrementByte();
+                        break;
+                    case "FF": //System call
+                        this.sysCall();
+                        break;
+                    default:
+                        this.isExecuting = false;
+                        break;
+                }
+                this.PC = this.PC % 256;
+                //Keep PCB up to date
+                this.updatePCB();
+                TSOS.Control.updateMemTable();
+
+                if(!_cpuScheduler.readyQueue.isEmpty()){
+                    _cpuScheduler.counter();
+                }
+            }} //end cycle
+
         public runProc(PID){
             this.currPCB = _MemManager.getPCB(PID);
+            //this.currPCB.State = 'Ready';
             this.loadFromPCB();
             this.isExecuting = true;
         }
 
         public loadProc(PCB){
             this.currPCB = PCB;
+            PCB.State = 'Running';
             this.loadFromPCB();
         }
 
@@ -151,13 +164,9 @@ module TSOS {
         }
         private compareX(){
             this.PC++;
-            var addr = parseInt(_MemManager.readMem(this.currPCB, addr), 16);
+            var addr = parseInt(_MemManager.readMem(this.currPCB, this.PC), 16);
             this.PC++;
-            if (this.Xreg === parseInt(_MemManager.readMem(this.currPCB, addr), 16)){
-                this.Zflag = 1;
-            } else {
-                this.Zflag = 0;
-            }
+            this.Zflag = (this.Xreg === parseInt(_MemManager.readMem(this.currPCB, addr), 16)) ? 1 : 0;
             this.PC++;
         }
         private branch(){
@@ -185,7 +194,7 @@ module TSOS {
             // if 1 in X register, print byte in Y register
             // else if 2 in X register, print 00 terminated string at addr stored in Y register
             if (this.Xreg === 1){
-                var str = this.Yreg.toString();
+                var params = { output: this.Yreg.toString() };
             } else {
                 var output = '';
                 var addr = this.Yreg;
@@ -196,13 +205,19 @@ module TSOS {
                     addr++;
                     var code = _MemManager.readMem(this.currPCB, addr);
                 }
-                var str = output;
+                var params = { output: output };
             }
-           _StdOut.putText(str);
+            _KernelInterruptQueue.enqueue(new Interrupt(SYSTEM_CALL_IRQ, params), 1);
             this.PC++;
         }
         private sysBreak(){
+            this.currPCB.State = 'Terminated';
             this.updatePCB();
+
+            //Clear memory partition
+            _MemManager.clearPart(this.currPCB.pID);
+            //Push PID to executed array
+            _MemManager.executed.push(this.currPCB.pID);
             this.clearPCB();
             //ClearMem
             //Array of Executed programs

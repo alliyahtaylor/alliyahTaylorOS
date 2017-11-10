@@ -127,9 +127,16 @@ module TSOS {
                     _StdIn.handleInput();
                     break;
                 case SYSTEM_CALL_IRQ:
+                    _StdOut.putText(params.output + '');
+                    _StdOut.advanceLine();
+                    _OsShell.putPrompt();
+                    break;
+                case CON_SWITCH_IRQ:
+                    _cpuScheduler.contextSwitch();
                     break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");
+                    break;
             }
         }
 
@@ -186,5 +193,6 @@ module TSOS {
             redalert.play();
             this.krnShutdown();
         }
+
     }
 }

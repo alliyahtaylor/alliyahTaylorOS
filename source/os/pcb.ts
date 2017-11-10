@@ -10,11 +10,10 @@ module TSOS{
                    public Limit = 0,
                    public State = ''
     ){}
-    //TODO Fix this awful Base/Limit thing you have going on wtf
+
         public init(pID){
                this.pID = pID;
-               this.Limit = 768/pID+1;
-               this.Base= this.Limit - 256;
+               this.State = 'New';
          }
 
         public update(PC, Acc, XReg, YReg, Zflag){
