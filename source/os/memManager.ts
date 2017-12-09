@@ -13,6 +13,7 @@ module TSOS {
         public load(PCB, program){
             //Find an available partition in memory
             var part = this.availPart();
+            //PID in the memory partition for easy clearing later
             this.memParts[part] = PCB.Pid;
             //account for which memory partition PCB is located in
             PCB.Base = part * 256;
@@ -25,7 +26,7 @@ module TSOS {
                }else{
                    opCode = program[i];
                }
-                _Memory.setOp(PCB.Base +i, opCode);
+                _Memory.setOp(PCB.Base + i, opCode);
             }
             }
 

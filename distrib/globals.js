@@ -19,6 +19,11 @@ var TIMER_IRQ = 0; // Pages 23 (timer), 9 (interrupts), and 561 (interrupt prior
 var KEYBOARD_IRQ = 1;
 var SYSTEM_CALL_IRQ = 2;
 var CON_SWITCH_IRQ = 3;
+//Hard Drive - Probably should also do this for Memory if I have time to clean stuff up
+var TRACKS = 4;
+var SECTORS = 8;
+var BLOCKS = 8;
+var BLOCK_SIZE = 64;
 //
 // Global Variables
 // TODO: Make a global object and use that instead of the "_" naming convention in the global namespace.
@@ -29,6 +34,7 @@ var _MemManager;
 var _cpuScheduler;
 var _PCB;
 var _PCBArr = [];
+var _HardDrive;
 var _OSclock = 0; // Page 23.
 var _Mode = 0; // (currently unused)  0 = Kernel Mode, 1 = User Mode.  See page 21.
 var _Canvas; // Initialized in Control.hostInit().
@@ -53,6 +59,7 @@ var _Status = new String(" ");
 var _SarcasticMode = false;
 // Global Device Driver Objects - page 12
 var _krnKeyboardDriver; //  = null;
+var _krnHardDriveDriver;
 var _hardwareClockID = null;
 // For testing (and enrichment)...
 var Glados = null; // This is the function Glados() in glados.js on Labouseur.com.

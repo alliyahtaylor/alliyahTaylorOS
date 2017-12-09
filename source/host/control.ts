@@ -148,6 +148,7 @@ module TSOS {
             _Memory.init();
             _MemManager = new MemManager();
             _PCB = new Pcb();
+            _HardDrive = new hardDrive();
             //Won't catch me forgetting to do this stuff again.
             _cpuScheduler = new cpuScheduler();
 

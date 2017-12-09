@@ -71,7 +71,13 @@ var TSOS;
             this.commandList[this.commandList.length] = sc;
             sc = new TSOS.ShellCommand(this.shellPS, "ps", "- Shows all running processes.");
             this.commandList[this.commandList.length] = sc;
-            sc = new TSOS.ShellCommand(this.shellKill, "kill", "- kills a process..");
+            sc = new TSOS.ShellCommand(this.shellKill, "kill", "- kills a process.");
+            this.commandList[this.commandList.length] = sc;
+            sc = new TSOS.ShellCommand(this.shellCreate, "create", "- Creates a file with the given filename.");
+            this.commandList[this.commandList.length] = sc;
+            sc = new TSOS.ShellCommand(this.shellRead, "read", "- Reads the contents of the given filename");
+            this.commandList[this.commandList.length] = sc;
+            sc = new TSOS.ShellCommand(this.shellDelete, "delete", "- Deletes the given filename from storage.");
             this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
@@ -337,7 +343,7 @@ var TSOS;
         Shell.prototype.shellLoad = function (args) {
             //Get the user input from the user program box
             var userProg = document.getElementById("taProgramInput").value;
-            //separate input into program aray
+            //separate input into program array
             var progString = '';
             var progArr = userProg.split(' ');
             for (var i = 0; i < progArr.length; i++) {
@@ -346,6 +352,7 @@ var TSOS;
             //make sure there's actually a user input
             if (progArr.length < 1) {
                 _StdOut.putText("Please input a program.");
+                //Make sure the program doesn't go over max length
             }
             else if (progArr.length > 256) {
                 //Error if program is too large for memory.
@@ -369,6 +376,8 @@ var TSOS;
                         _MemManager.incPID();
                         //Update the mem table with the loaded program.
                         TSOS.Control.updateMemTable();
+                        //Add the PCB to the ready queue. Why weren't you doing this already?
+                        _cpuScheduler.loadQueue();
                     }
                     else {
                         _StdOut.putText('No memory available. Please clear memory');
@@ -416,6 +425,23 @@ var TSOS;
         };
         Shell.prototype.shellPS = function () {
             _StdOut.putText('Active Processes:');
+            if (_cpuScheduler.readyQueue.isEmpty) {
+                if (_CPU.isExecuting == false) {
+                    _StdOut.putText(' None.');
+                }
+                else if (_CPU.isExecuting == true) {
+                    _StdOut.putText(_CPU.currPCB.pID.toString());
+                }
+            }
+            else {
+                _StdOut.putText('test');
+                var procStr = _CPU.currPCB.pID + '';
+                for (var i = -1; i < _cpuScheduler.readyQueue.getSize(); i++) {
+                    var actPID = _cpuScheduler.readyQueue.q[i].pID.toString();
+                    procStr += actPID + ' ';
+                }
+                _StdOut.putText(procStr);
+            }
         };
         Shell.prototype.shellKill = function (args) {
             if (args.length === 0) {
@@ -431,6 +457,27 @@ var TSOS;
                 var PCB = _PCBArr[PID];
                 PCB.State = 'Terminated';
             }
+        };
+        Shell.prototype.shellCreate = function (args) {
+            if (args.length < 1) {
+                _StdOut.putText('Please include a file name.');
+            }
+            else if (args.length > 60) {
+                _StdOut.putText('File names must be no longer than 60 characters.');
+            }
+            else {
+                if (!_krnHardDriveDriver.formatted) {
+                    _StdOut.putText('The hard drive must be formatted to create a file.');
+                }
+                else {
+                    _StdOut.putText('creting');
+                    _krnHardDriveDriver.createFile(name);
+                }
+            }
+        };
+        Shell.prototype.shellRead = function () {
+        };
+        Shell.prototype.shellDelete = function () {
         };
         return Shell;
     }());

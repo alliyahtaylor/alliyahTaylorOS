@@ -19,6 +19,7 @@ var TSOS;
         MemManager.prototype.load = function (PCB, program) {
             //Find an available partition in memory
             var part = this.availPart();
+            //PID in the memory partition for easy clearing later
             this.memParts[part] = PCB.Pid;
             //account for which memory partition PCB is located in
             PCB.Base = part * 256;

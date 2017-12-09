@@ -101,13 +101,13 @@ var TSOS;
         }; //end cycle
         Cpu.prototype.runProc = function (PID) {
             this.currPCB = _MemManager.getPCB(PID);
-            //this.currPCB.State = 'Ready';
+            this.currPCB.State = 'Running';
             this.loadFromPCB();
             this.isExecuting = true;
         };
         Cpu.prototype.loadProc = function (PCB) {
             this.currPCB = PCB;
-            PCB.State = 'Running';
+            PCB.State = 'Ready';
             this.loadFromPCB();
         };
         //Op Code Programs

@@ -98,14 +98,14 @@ module TSOS {
 
         public runProc(PID){
             this.currPCB = _MemManager.getPCB(PID);
-            //this.currPCB.State = 'Ready';
+            this.currPCB.State = 'Running';
             this.loadFromPCB();
             this.isExecuting = true;
         }
 
         public loadProc(PCB){
             this.currPCB = PCB;
-            PCB.State = 'Running';
+            PCB.State = 'Ready';
             this.loadFromPCB();
         }
 

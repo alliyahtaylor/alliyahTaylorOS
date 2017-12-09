@@ -128,6 +128,7 @@ var TSOS;
             _Memory.init();
             _MemManager = new TSOS.MemManager();
             _PCB = new TSOS.Pcb();
+            _HardDrive = new TSOS.hardDrive();
             //Won't catch me forgetting to do this stuff again.
             _cpuScheduler = new TSOS.cpuScheduler();
             // ... then set the host clock pulse ...

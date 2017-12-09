@@ -27,6 +27,11 @@ const SYSTEM_CALL_IRQ: number = 2;
 
 const CON_SWITCH_IRQ: number = 3;
 
+//Hard Drive - Probably should also do this for Memory if I have time to clean stuff up
+const TRACKS: number = 4;
+const SECTORS: number = 8;
+const BLOCKS: number = 8;
+const BLOCK_SIZE: number = 64;
 
 //
 // Global Variables
@@ -38,6 +43,8 @@ var _MemManager: TSOS.MemManager;
 var _cpuScheduler: TSOS.cpuScheduler;
 var _PCB: TSOS.Pcb;
 var _PCBArr = [];
+var _HardDrive: TSOS.hardDrive
+
 
 var _OSclock: number = 0;  // Page 23.
 
@@ -71,6 +78,7 @@ var _SarcasticMode: boolean = false;
 
 // Global Device Driver Objects - page 12
 var _krnKeyboardDriver; //  = null;
+var _krnHardDriveDriver;
 
 var _hardwareClockID: number = null;
 

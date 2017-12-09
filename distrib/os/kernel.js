@@ -36,6 +36,10 @@ var TSOS;
             _krnKeyboardDriver = new TSOS.DeviceDriverKeyboard(); // Construct it.
             _krnKeyboardDriver.driverEntry(); // Call the driverEntry() initialization routine.
             this.krnTrace(_krnKeyboardDriver.status);
+            this.krnTrace('Loading the hard drive device driver.');
+            _krnHardDriveDriver = new TSOS.DeviceDriverHardDrive();
+            _krnHardDriveDriver.driverEntry();
+            this.krnTrace(_krnHardDriveDriver.status);
             //
             // ... more?
             //
