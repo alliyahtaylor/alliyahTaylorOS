@@ -151,14 +151,36 @@ var TSOS;
             }
         };
         //Read File
-        DeviceDriverHardDrive.prototype.readFile = function (tsb, isProgram) {
+        DeviceDriverHardDrive.prototype.readFile = function (name) {
+            var dirTSB = this.getFile(name);
+            if (dirTSB === '') {
+                return 'File not found';
+            }
+            else {
+                var fileTSB = this.getFileTSB(dirTSB);
+                return (this.readData(fileTSB, false));
+            }
+        };
+        //Read Data
+        DeviceDriverHardDrive.prototype.readData = function (tsb, isProgram) {
             var data = '';
             if (isProgram) {
+                data = this.getHexData(tsb);
+            }
+            else {
+                data = this.getData(tsb);
+            }
+            if (this.getTSB(tsb) === '~~~') {
+                return data;
+            }
+            else {
+                var newTSB = this.getTSB(tsb);
+                return (data + this.readData(newTSB, isProgram));
             }
         };
         //Delete File
         DeviceDriverHardDrive.prototype.deleteFile = function (name) {
-            var dirTSB = this.getFileTSB(name);
+            var dirTSB = this.getFile(name);
             if (dirTSB.toString() === '') {
                 _StdOut.putText('Error, file not found');
             }
@@ -278,6 +300,11 @@ var TSOS;
                 str += String.fromCharCode(parseInt(byte, 16));
             }
             return str;
+        };
+        DeviceDriverHardDrive.prototype.getHexData = function (tsb) {
+            var data = _HardDrive.read(tsb);
+            data = data.substring(4, data.length);
+            return data;
         };
         return DeviceDriverHardDrive;
     }(TSOS.DeviceDriver));

@@ -79,6 +79,8 @@ var TSOS;
             this.commandList[this.commandList.length] = sc;
             sc = new TSOS.ShellCommand(this.shellDelete, "delete", "- Deletes the given filename from storage.");
             this.commandList[this.commandList.length] = sc;
+            sc = new TSOS.ShellCommand(this.shellFormat, "format", "- Formats the hard drive.");
+            this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
             //
@@ -470,14 +472,36 @@ var TSOS;
                     _StdOut.putText('The hard drive must be formatted to create a file.');
                 }
                 else {
-                    _StdOut.putText('creting');
+                    //TODO delete test text
+                    _StdOut.putText('creating');
                     _krnHardDriveDriver.createFile(name);
                 }
             }
         };
-        Shell.prototype.shellRead = function () {
+        Shell.prototype.shellRead = function (args) {
+            if (_krnHardDriveDriver.formatted) {
+                if (args.length > 0) {
+                    _StdOut.putText(_krnHardDriveDriver.readFile(args));
+                }
+                else {
+                    _StdOut.putText('Please include a file name.');
+                }
+            }
+            else {
+                _StdOut.putText('Hard drive must be formatted first');
+            }
         };
         Shell.prototype.shellDelete = function () {
+        };
+        Shell.prototype.shellFormat = function () { };
+        Shell.prototype.shellWrite = function () {
+            if (_CPU.isExecuting) {
+                _StdOut.PutText('The drive cannot be formatted while programs are running.');
+            }
+            else {
+                _krnHardDriveDriver.krnHDDFormat();
+                _StdOut.PutText('The Hard Drive has been formatted successfully.');
+            }
         };
         return Shell;
     }());

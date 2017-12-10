@@ -143,16 +143,34 @@ module TSOS{
         }
 
         //Read File
-        public readFile(tsb, isProgram){
+        public readFile(name){
+            var dirTSB = this.getFile(name);
+            if (dirTSB === ''){
+                return 'File not found';
+            }else{
+                var fileTSB = this.getFileTSB(dirTSB);
+                return(this.readData(fileTSB, false));
+            }
+        }
+        //Read Data
+        public readData(tsb, isProgram){
             var data = '';
-           if (isProgram){
-
-           }
+            if (isProgram){
+                data = this.getHexData(tsb);
+            }else {
+                data = this.getData(tsb);
+            }
+            if (this.getTSB(tsb) === '~~~'){
+                return data;
+            }else{
+                var newTSB = this.getTSB(tsb);
+                return (data + this.readData(newTSB, isProgram));
+            }
         }
 
         //Delete File
         public deleteFile(name){
-            var dirTSB = this.getFileTSB(name);
+            var dirTSB = this.getFile(name);
             if (dirTSB.toString() === ''){
                 _StdOut.putText('Error, file not found');
             }else{
@@ -269,6 +287,11 @@ module TSOS{
                 str += String.fromCharCode(parseInt(byte, 16));
             }
             return str;
+        }
+        public getHexData(tsb){
+            var data = _HardDrive.read(tsb);
+            data = data.substring(4, data.length);
+            return data;
         }
     }
 

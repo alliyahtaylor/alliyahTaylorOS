@@ -43,7 +43,7 @@ var _MemManager: TSOS.MemManager;
 var _cpuScheduler: TSOS.cpuScheduler;
 var _PCB: TSOS.Pcb;
 var _PCBArr = [];
-var _HardDrive: TSOS.hardDrive
+var _HardDrive: TSOS.hardDrive;
 
 
 var _OSclock: number = 0;  // Page 23.
@@ -78,7 +78,7 @@ var _SarcasticMode: boolean = false;
 
 // Global Device Driver Objects - page 12
 var _krnKeyboardDriver; //  = null;
-var _krnHardDriveDriver;
+var _krnHardDriveDriver: TSOS.DeviceDriverHardDrive;
 
 var _hardwareClockID: number = null;
 
