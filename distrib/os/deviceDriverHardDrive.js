@@ -124,7 +124,7 @@ var TSOS;
                 for (i; i < BLOCK_SIZE - 4; i++) {
                     dirBlock += '00';
                 }
-                var dirTSB = this.findFreeDir.toString();
+                var dirTSB = this.findFreeDir();
                 if (dirTSB !== '') {
                     _HardDrive.write(dirTSB, dirBlock);
                 }
@@ -141,31 +141,25 @@ var TSOS;
         DeviceDriverHardDrive.prototype.writeFile = function (name, data) {
             var dirTSB = this.getFile(name);
             if (dirTSB === '') {
-                _StdOut.putText('That file does not exist');
+                _StdOut.putText('That file does not exist.');
             }
             else {
-                var fileTSB = this.getTSB(dirTSB);
                 var size = data.length;
-                _StdOut.putText(fileTSB.toString());
-                var nextTSB = this.getTSB(fileTSB);
-                _StdOut.putText('test');
-                if (nextTSB !== '~~~') {
+                var fileTSB = this.getTSB(dirTSB);
+                if (this.getTSB(fileTSB) !== '~~~') {
                     this.clearData(fileTSB);
                 }
-                _StdOut.putText('test');
                 this.setData(fileTSB, data, size, false);
-                _StdOut.putText('test');
             }
         };
         //Read File
         DeviceDriverHardDrive.prototype.readFile = function (name) {
-            var dirTSB = this.getFile(name);
-            if (dirTSB === '') {
-                return 'File not found';
+            var TSB = this.getFile(name);
+            if (TSB === '') {
+                return ('That file does not exist.');
             }
             else {
-                var fileTSB = this.getTSB(dirTSB);
-                return (this.readData(fileTSB, false));
+                return this.readData(TSB, false);
             }
         };
         //Read Data
@@ -230,8 +224,7 @@ var TSOS;
                     tsb = '' + t + s + b;
                     if (this.inUse(tsb)) {
                         //check the file name
-                        var data = this.getData(tsb);
-                        if (data.localeCompare(name)) {
+                        if (this.checkName(name, tsb)) {
                             success = true;
                         }
                     }
@@ -242,6 +235,15 @@ var TSOS;
             }
             else {
                 return '';
+            }
+        };
+        DeviceDriverHardDrive.prototype.checkName = function (name, tsb) {
+            var data = this.getData(tsb);
+            if (data.localeCompare(name) === 0) {
+                return true;
+            }
+            else {
+                return false;
             }
         };
         //Get TSB from dir

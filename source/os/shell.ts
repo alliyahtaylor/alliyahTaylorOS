@@ -560,7 +560,7 @@ module TSOS {
         public shellRead(args){
         if (_krnHardDriveDriver.formatted){
             if(args.length >0){
-                _StdOut.putText(_krnHardDriveDriver.readFile(args));
+                _StdOut.putText(_krnHardDriveDriver.readFile(args[0]));
             }else{
                 _StdOut.putText('Please include a file name.');
             }
@@ -569,7 +569,8 @@ module TSOS {
         }
         }
         public shellDelete(){
-        }public shellFormat(){
+        }
+        public shellFormat(){
 
             if (_CPU.isExecuting === true){
                 _StdOut.putText('The drive cannot be formatted while programs are running.');
@@ -579,10 +580,13 @@ module TSOS {
 
         }
         public shellWrite(args){
-        if(!_krnHardDriveDriver.formatted){
-            _StdOut.putText('Yo, format the shit.');
-        }else if (args.length < 2){
+            if(!_krnHardDriveDriver.formatted){
+                //Don't print out 'Yo, format the shit. That's just rude.
+                _StdOut.putText('Hard drive must be formatted first.');
+            }else if (args.length < 2){
                 _StdOut.putText('Please include filename and \"data\" in that order.');
+            }else if(args[1].charAt(0) != "\"" || args[args.length-1].charAt(args[args.length-1].length-1) != "\"") {
+                _StdOut.putText('Data must be within quotation marks.');
             }else{
                 var name = args[0];
                 var data = '';
@@ -594,6 +598,7 @@ module TSOS {
                     data += args[i];
                 }
                 _krnHardDriveDriver.writeFile(name, data);
+                _StdOut.putText('Data successfully written to ' + name);
             }
         }
     }

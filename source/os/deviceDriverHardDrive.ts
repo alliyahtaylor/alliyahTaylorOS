@@ -116,7 +116,7 @@ module TSOS{
                 for (i; i < BLOCK_SIZE - 4; i++){
                     dirBlock += '00';
                 }
-                var dirTSB = this.findFreeDir.toString();
+                var dirTSB = this.findFreeDir();
                 if (dirTSB !== ''){
                     _HardDrive.write(dirTSB, dirBlock);
                 }else {
@@ -131,15 +131,14 @@ module TSOS{
         //Write File
         public writeFile(name, data){
             var dirTSB = this.getFile(name);
+
             if(dirTSB === ''){
-                _StdOut.putText('That file does not exist');
+                _StdOut.putText('That file does not exist.');
             } else {
-                var fileTSB = this.getTSB(dirTSB);
                 var size = data.length;
+                var fileTSB = this.getTSB(dirTSB);
 
-                var nextTSB = this.getTSB(fileTSB);
-
-                if (nextTSB !== '~~~'){
+                if (this.getTSB(fileTSB) !== '~~~'){
                     this.clearData(fileTSB);
                 }
                 this.setData(fileTSB, data, size, false);
@@ -149,13 +148,12 @@ module TSOS{
 
         //Read File
         public readFile(name){
-            var dirTSB = this.getFile(name);
-            if (dirTSB === ''){
-                return 'File not found';
-            }else{
-                var fileTSB = this.getTSB(dirTSB);
-                return(this.readData(fileTSB, false));
-            }
+           var TSB = this.getFile(name);
+           if(TSB === ''){
+               return('That file does not exist.');
+           }else{
+               return this.readData(TSB, false);
+           }
         }
         //Read Data
         public readData(tsb, isProgram){
@@ -217,10 +215,9 @@ module TSOS{
                     tsb = '' + t + s + b;
                     if (this.inUse(tsb)){
                         //check the file name
-                       var data = this.getData(tsb);
-                        if (data.localeCompare(name)){
-                            success = true;
-                        }
+                     if(this.checkName(name, tsb)){
+                         success = true
+                     }
                     }
                 }
             }
@@ -228,6 +225,14 @@ module TSOS{
                 return tsb;
             }else{
                 return '';
+            }
+        }
+        public checkName(name, tsb){
+            var data = this.getData(tsb);
+            if (data.localeCompare(name) === 0){
+                return true;
+            }else{
+                return false;
             }
         }
         //Get TSB from dir
@@ -243,7 +248,7 @@ module TSOS{
             var block = '';
             var i;
             if(isProgram){
-                limit = limit *2;
+                limit = limit * 2;
                 block += data.substring(0, limit);
             }else{
                 for (i = 0; i < data.length && i < limit; i++){
