@@ -46,7 +46,7 @@ var TSOS;
             for (var t = 0; t < TRACKS; t++) {
                 for (var s = 0; s < SECTORS; s++) {
                     for (var b = 0; b < BLOCKS; b++) {
-                        var tsb = t + s + b + '';
+                        var tsb = '' + t + s + b;
                         if (tsb === '000') {
                             _HardDrive.write(tsb, mbr);
                         }
@@ -57,6 +57,7 @@ var TSOS;
                 }
             }
             this.formatted = true;
+            _StdOut.putText('Format Successful.');
         };
         //Find a free directory block
         DeviceDriverHardDrive.prototype.findFreeDir = function () {
@@ -109,14 +110,16 @@ var TSOS;
         };
         //Create File
         DeviceDriverHardDrive.prototype.createFile = function (name) {
-            var fileTSB = this.findFreeFile.toString();
+            var fileTSB = this.findFreeFile().toString();
             var i;
             if (fileTSB !== '') {
                 this.setUse(fileTSB, true);
                 //create directory block
                 var dirBlock = '1' + fileTSB;
                 for (i = 0; i < name.length; i++) {
-                    dirBlock += name.charCodeAt(i).toString(16);
+                    var code = name.charCodeAt(i).toString(16);
+                    _StdOut.putText('test');
+                    dirBlock += code;
                 }
                 //Zero the rest out
                 for (i; i < BLOCK_SIZE - 4; i++) {
@@ -133,7 +136,7 @@ var TSOS;
             else {
                 _StdOut.putText('No free file space available.');
             }
-            _StdOut.putText('File' + name + 'successfully created');
+            _StdOut.putText('File ' + name + ' successfully created');
         };
         //Write File
         DeviceDriverHardDrive.prototype.writeFile = function (name, data) {
@@ -203,13 +206,12 @@ var TSOS;
         //set something in use
         DeviceDriverHardDrive.prototype.setUse = function (tsb, status) {
             var block = _HardDrive.read(tsb);
-            if (status === true) {
-                var tempBlock = block.slice(1, block.length - 1);
-                block = "1" + tempBlock;
+            block = block.slice(1, block.length - 1);
+            if (status) {
+                block = '1' + block;
             }
             else {
-                tempBlock = block.slice(1, block.length - 1);
-                block = "0" + tempBlock;
+                block = '0' + block;
             }
             _HardDrive.write(tsb, block);
         };

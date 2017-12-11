@@ -29,14 +29,14 @@ module TSOS{
             var mbr = '1~~~MBR';
             //Make an empty block
             var emptyBlock = '0~~~';
-            for (let i = 0; i < BLOCK_SIZE -4; i++){
+            for (var i = 0; i < BLOCK_SIZE -4; i++){
                 emptyBlock += "00";
             }
             //write the empty blocks
-            for (let t = 0; t < TRACKS; t++){
-                for (let s = 0; s < SECTORS; s++){
-                    for (let b = 0; b < BLOCKS; b++){
-                        let tsb = t + s + b + '';
+            for (var t = 0; t < TRACKS; t++){
+                for (var s = 0; s < SECTORS; s++){
+                    for (var b = 0; b < BLOCKS; b++){
+                        var tsb: string = '' + t + s + b;
                         if (tsb === '000'){
                             _HardDrive.write(tsb, mbr);
                         }else{
@@ -46,17 +46,18 @@ module TSOS{
                 }
             }
             this.formatted = true;
+            _StdOut.putText('Format Successful.');
         }
 
         //Find a free directory block
         public findFreeDir(){
             var t = 0;
-            var resultTSB = '';
+            var resultTSB: string = '';
             var success = false;
 
             //loop through the sectors and blocks
-            for(let s = 0; s < SECTORS && !success; s++){
-                for (let b = 0; b < BLOCKS && !success; b++){
+            for(var s = 0; s < SECTORS && !success; s++){
+                for(var b = 0; b < BLOCKS && !success; b++){
                     resultTSB = '' + t + s + b;
                     if(!this.inUse(resultTSB)){
                         success = true;
@@ -72,14 +73,14 @@ module TSOS{
 
         //find a free data block
         public findFreeFile(){
-            var resultTSB = '';
-            var success = false;
+            var resultTSB: string = '';
+            var success: boolean = false;
 
             //loop through the possbile TSBs. Nested For loops are ugly
             //start t at 1 because this isn't a directory
-            for(let t = 1; t < TRACKS && !success; t++){
-                for (let s = 0; s < SECTORS && !success; s++){
-                    for (let b = 0; b < BLOCKS && !success; b++){
+            for(var t = 1; t < TRACKS && !success; t++){
+                for (var s = 0; s < SECTORS && !success; s++){
+                    for (var b = 0; b < BLOCKS && !success; b++){
                         resultTSB = '' + t + s + b;
                         if(!this.inUse(resultTSB)){
                             success = true;
@@ -91,7 +92,7 @@ module TSOS{
                 return '';
             } else {
                 var emptyBlock = '0~~~';
-                for (let i = 0; i < BLOCK_SIZE - 4; i++) {
+                for (var i = 0; i < BLOCK_SIZE - 4; i++) {
                     emptyBlock += "00";
                 }
                 _HardDrive.write(resultTSB, emptyBlock);
@@ -100,15 +101,16 @@ module TSOS{
         }
 
         //Create File
-        public createFile(name){
-            var fileTSB = this.findFreeFile.toString();
-            var i;
+        public createFile(name: string){
+            var fileTSB : string = this.findFreeFile().toString();
+            var i: number;
             if(fileTSB !== ''){
                 this.setUse(fileTSB, true);
                 //create directory block
                 var dirBlock = '1' + fileTSB;
                 for (i = 0; i < name.length; i++){
-                    dirBlock += name.charCodeAt(i).toString(16);
+                    var code = name.charCodeAt(i).toString(16);
+                    dirBlock += code;
                 }
                 //Zero the rest out
                 for (i; i < BLOCK_SIZE - 4; i++){
@@ -123,7 +125,7 @@ module TSOS{
             }else{
                 _StdOut.putText('No free file space available.');
             }
-            _StdOut.putText('File' + name + 'successfully created');
+            _StdOut.putText('File ' + name + ' successfully created');
         }
 
         //Write File
@@ -192,13 +194,12 @@ module TSOS{
         }
         //set something in use
         public setUse(tsb, status){
-            var block = _HardDrive.read(tsb);
-            if (status === true){
-            var tempBlock = block.slice(1, block.length -1);
-            block = "1" + tempBlock;
+            var block: string = _HardDrive.read(tsb);
+            block = block.slice(1, block.length - 1);
+            if(status){
+                block = '1' + block;
             }else{
-                tempBlock = block.slice(1, block.length -1);
-                block = "0" + tempBlock;
+                block = '0' + block;
             }
             _HardDrive.write(tsb, block);
     }

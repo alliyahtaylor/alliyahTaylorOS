@@ -5,7 +5,7 @@ var TSOS;
         function hardDrive() {
         }
         hardDrive.prototype.write = function (tsb, data) {
-            sessionStorage[tsb] = data;
+            sessionStorage.setItem(tsb, data);
         };
         hardDrive.prototype.read = function (tsb) {
             return sessionStorage[tsb];

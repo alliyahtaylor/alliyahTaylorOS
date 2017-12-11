@@ -146,7 +146,7 @@ module TSOS {
             this.commandList[this.commandList.length] = sc;
             sc = new ShellCommand (this.shellFormat,
                 "format",
-                "- Formats the hard drive.")
+                "- Formats the drive.")
             this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
@@ -549,9 +549,7 @@ module TSOS {
                if(!_krnHardDriveDriver.formatted){
                    _StdOut.putText('The hard drive must be formatted to create a file.');
                }else{
-                   //TODO delete test text
-                   _StdOut.putText('creating');
-                   _krnHardDriveDriver.createFile(name);
+                   _krnHardDriveDriver.createFile(args.toString());
                }
            }
         }
@@ -567,16 +565,17 @@ module TSOS {
         }
         }
         public shellDelete(){
-
         }
-        public shellFormat(){}
-        public shellWrite(){
-            if (_CPU.isExecuting){
-                _StdOut.PutText('The drive cannot be formatted while programs are running.');
+        public shellFormat(){
+
+            if (_CPU.isExecuting === true){
+                _StdOut.putText('The drive cannot be formatted while programs are running.');
             }else{
                 _krnHardDriveDriver.krnHDDFormat();
-                _StdOut.PutText('The Hard Drive has been formatted successfully.');
+
             }
+
         }
+        public shellWrite(){}
     }
 }
