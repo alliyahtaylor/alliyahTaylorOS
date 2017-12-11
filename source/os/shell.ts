@@ -152,8 +152,10 @@ module TSOS {
                 "write",
                 "- Writes to a previously created file.")
             this.commandList[this.commandList.length] = sc;
-            // ps  - list the running processes and their IDs
-            // kill <id> - kills the specified process id.
+            sc = new ShellCommand (this.shellls,
+                "ls",
+                "- Lists all files on the disk.")
+            this.commandList[this.commandList.length] = sc;
 
             //
             // Display the initial prompt.
@@ -565,10 +567,17 @@ module TSOS {
                 _StdOut.putText('Please include a file name.');
             }
         }else{
-            _StdOut.putText('Hard drive must be formatted first');
+            _StdOut.putText('Hard drive must be formatted first.');
         }
         }
-        public shellDelete(){
+        public shellDelete(args){
+            if(!_krnHardDriveDriver.formatted){
+                _StdOut.putText('Hard drive must be formatted first.');
+            }else if(args.length < 1){
+                _StdOut.putText('Please include a file name.');
+            }else{
+                _krnHardDriveDriver.deleteFile(args[0]);
+            }
         }
         public shellFormat(){
 
@@ -599,6 +608,13 @@ module TSOS {
                 }
                 _krnHardDriveDriver.writeFile(name, data);
                 _StdOut.putText('Data successfully written to ' + name);
+            }
+        }
+        public shellls(){
+            if(!_krnHardDriveDriver.formatted){
+                _StdOut.putText('The hard drive must be formatted first.')
+            }else {
+                _krnHardDriveDriver.listFiles();
             }
         }
     }

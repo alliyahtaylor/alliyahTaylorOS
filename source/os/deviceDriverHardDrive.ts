@@ -298,6 +298,24 @@ module TSOS{
             data = data.substring(4, data.length);
             return data;
         }
+        public listFiles(){
+            var tsb = '';
+            var t = 0;
+            var listarr =[];
+
+            for(var s = 0; s < SECTORS; s++){
+                for(var b = 0; b < BLOCKS; b++){
+                    tsb = '' + t + s + b;
+                    if(this.inUse(tsb)){
+                    listarr.push(this.getData(tsb));}
+                }
+            }
+            if (listarr.length < 1){
+                _StdOut.putText('There are currently no files in the directory.');
+            }else{
+                _StdOut.putText(listarr.toString());
+            }
+        }
     }
 
 }

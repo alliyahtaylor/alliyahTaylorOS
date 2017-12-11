@@ -83,8 +83,8 @@ var TSOS;
             this.commandList[this.commandList.length] = sc;
             sc = new TSOS.ShellCommand(this.shellWrite, "write", "- Writes to a previously created file.");
             this.commandList[this.commandList.length] = sc;
-            // ps  - list the running processes and their IDs
-            // kill <id> - kills the specified process id.
+            sc = new TSOS.ShellCommand(this.shellls, "ls", "- Lists all files on the disk.");
+            this.commandList[this.commandList.length] = sc;
             //
             // Display the initial prompt.
             this.putPrompt();
@@ -488,10 +488,19 @@ var TSOS;
                 }
             }
             else {
-                _StdOut.putText('Hard drive must be formatted first');
+                _StdOut.putText('Hard drive must be formatted first.');
             }
         };
-        Shell.prototype.shellDelete = function () {
+        Shell.prototype.shellDelete = function (args) {
+            if (!_krnHardDriveDriver.formatted) {
+                _StdOut.putText('Hard drive must be formatted first.');
+            }
+            else if (args.length < 1) {
+                _StdOut.putText('Please include a file name.');
+            }
+            else {
+                _krnHardDriveDriver.deleteFile(args[0]);
+            }
         };
         Shell.prototype.shellFormat = function () {
             if (_CPU.isExecuting === true) {
@@ -525,6 +534,9 @@ var TSOS;
                 _krnHardDriveDriver.writeFile(name, data);
                 _StdOut.putText('Data successfully written to ' + name);
             }
+        };
+        Shell.prototype.shellls = function () {
+            _krnHardDriveDriver.listFiles();
         };
         return Shell;
     }());
