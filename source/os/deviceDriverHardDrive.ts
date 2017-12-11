@@ -109,7 +109,7 @@ module TSOS{
                 //create directory block
                 var dirBlock = '1' + fileTSB;
                 for (i = 0; i < name.length; i++){
-                    var code = name.charCodeAt(i).toString(16);
+                    var code = name.charCodeAt(i).toString(16).toUpperCase();
                     dirBlock += code;
                 }
                 //Zero the rest out
@@ -134,13 +134,16 @@ module TSOS{
             if(dirTSB === ''){
                 _StdOut.putText('That file does not exist');
             } else {
-                var fileTSB = this.getTSB.toString();
+                var fileTSB = this.getTSB(dirTSB);
                 var size = data.length;
 
-                if (this.getFileTSB(fileTSB).toString() !== '~~~'){
+                var nextTSB = this.getTSB(fileTSB);
+
+                if (nextTSB !== '~~~'){
                     this.clearData(fileTSB);
                 }
                 this.setData(fileTSB, data, size, false);
+
             }
         }
 
@@ -150,7 +153,7 @@ module TSOS{
             if (dirTSB === ''){
                 return 'File not found';
             }else{
-                var fileTSB = this.getFileTSB(dirTSB);
+                var fileTSB = this.getTSB(dirTSB);
                 return(this.readData(fileTSB, false));
             }
         }
@@ -176,7 +179,7 @@ module TSOS{
             if (dirTSB.toString() === ''){
                 _StdOut.putText('Error, file not found');
             }else{
-                var fileTSB = this.getFileTSB(dirTSB);
+                var fileTSB = this.getTSB(dirTSB);
                 this.clearData(fileTSB);
                 this.setUse(dirTSB, false);
                 _StdOut.putText('File deleted.');
@@ -215,26 +218,22 @@ module TSOS{
                     if (this.inUse(tsb)){
                         //check the file name
                        var data = this.getData(tsb);
-                        if (data.localeCompare(name) === 0){
+                        if (data.localeCompare(name)){
                             success = true;
-                            return tsb;
-                        }else{
-                            return '';
                         }
                     }
                 }
+            }
+            if(success){
+                return tsb;
+            }else{
+                return '';
             }
         }
         //Get TSB from dir
         public getTSB(tsb: string){
            var block = _HardDrive.read(tsb);
             //TODO Change how this is done
-            var tsb = '' + block.charAt(1) + block.charAt(2) + block.charAt(3);
-            return tsb;
-        }
-        //Get TSB from file
-        public getFileTSB(tsb: string){
-            var block = _HardDrive.read(tsb);
             var tsb = '' + block.charAt(1) + block.charAt(2) + block.charAt(3);
             return tsb;
         }
@@ -258,7 +257,7 @@ module TSOS{
                 block = '1~~~' + block;
                 _HardDrive.write(TSB, block);
             }else{
-                var newTSB = this.getFileTSB(TSB);
+                var newTSB = this.getTSB(TSB);
                 this.setUse(newTSB, true)
                 block = '1' + newTSB + block;
                 _HardDrive.write(TSB, true);
@@ -268,10 +267,10 @@ module TSOS{
         }
         public clearData(tsb){
             this.setUse(tsb, false);
-            if(this.getFileTSB(tsb) === "~~~"){
-                //TODO krntrace???
+            if(this.getTSB(tsb) === "~~~"){
+
             }else{
-                var nextTSB = this.getFileTSB(tsb);
+                var nextTSB = this.getTSB(tsb);
                 this.clearData(nextTSB);
         }
 

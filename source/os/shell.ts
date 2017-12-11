@@ -148,6 +148,10 @@ module TSOS {
                 "format",
                 "- Formats the drive.")
             this.commandList[this.commandList.length] = sc;
+            sc = new ShellCommand (this.shellWrite,
+                "write",
+                "- Writes to a previously created file.")
+            this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
 
@@ -565,17 +569,32 @@ module TSOS {
         }
         }
         public shellDelete(){
-        }
-        public shellFormat(){
+        }public shellFormat(){
 
             if (_CPU.isExecuting === true){
                 _StdOut.putText('The drive cannot be formatted while programs are running.');
             }else{
                 _krnHardDriveDriver.krnHDDFormat();
-
             }
 
         }
-        public shellWrite(){}
+        public shellWrite(args){
+        if(!_krnHardDriveDriver.formatted){
+            _StdOut.putText('Yo, format the shit.');
+        }else if (args.length < 2){
+                _StdOut.putText('Please include filename and \"data\" in that order.');
+            }else{
+                var name = args[0];
+                var data = '';
+                for (var i = 1; i < args.length; i++){
+                    //Include spaces if there's more data after
+                    if ((i+1) <= args.length){
+                        data +=' ';
+                    }
+                    data += args[i];
+                }
+                _krnHardDriveDriver.writeFile(name, data);
+            }
+        }
     }
 }

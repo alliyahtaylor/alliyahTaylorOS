@@ -81,6 +81,8 @@ var TSOS;
             this.commandList[this.commandList.length] = sc;
             sc = new TSOS.ShellCommand(this.shellFormat, "format", "- Formats the drive.");
             this.commandList[this.commandList.length] = sc;
+            sc = new TSOS.ShellCommand(this.shellWrite, "write", "- Writes to a previously created file.");
+            this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
             //
@@ -499,7 +501,26 @@ var TSOS;
                 _krnHardDriveDriver.krnHDDFormat();
             }
         };
-        Shell.prototype.shellWrite = function () { };
+        Shell.prototype.shellWrite = function (args) {
+            if (!_krnHardDriveDriver.formatted) {
+                _StdOut.putText('Yo, format the shit.');
+            }
+            else if (args.length < 2) {
+                _StdOut.putText('Please include filename and \"data\" in that order.');
+            }
+            else {
+                var name = args[0];
+                var data = '';
+                for (var i = 1; i < args.length; i++) {
+                    //Include spaces if there's more data after
+                    if ((i + 1) <= args.length) {
+                        data += ' ';
+                    }
+                    data += args[i];
+                }
+                _krnHardDriveDriver.writeFile(name, data);
+            }
+        };
         return Shell;
     }());
     TSOS.Shell = Shell;
