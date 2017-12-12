@@ -275,10 +275,10 @@ var TSOS;
                 _HardDrive.write(TSB, block);
             }
             else {
-                var newTSB = this.getTSB(TSB);
+                var newTSB = this.findFreeFile();
                 this.setUse(newTSB, true);
                 block = '1' + newTSB + block;
-                _HardDrive.write(TSB, true);
+                _HardDrive.write(TSB, block);
                 var leftovers = data.substring(limit, data.length);
                 this.setData(newTSB, leftovers, size - limit, isProgram);
             }
@@ -326,6 +326,44 @@ var TSOS;
             }
             else {
                 _StdOut.putText(listarr.toString());
+            }
+        };
+        //out of mem, onto disk
+        DeviceDriverHardDrive.prototype.rollOut = function (program, part, PCB) {
+            //if file does not exist, create it.
+            var PID = PCB.pID.toString();
+            var name = 'PID' + PID;
+            if (this.getFile(name) !== '') {
+                var dirTSB = this.getFile(name);
+                var fileTSB = this.getTSB(dirTSB);
+            }
+            else {
+                this.createFile(name);
+                _StdOut.advanceLine();
+                var dirTSB = this.getFile(name);
+                var fileTSB = this.getTSB(dirTSB);
+            }
+            this.setUse(fileTSB, true);
+            this.setData(fileTSB, program.toString(), program.length, true);
+            if (part !== -1) {
+                _MemManager.clearPart(part);
+            }
+            PCB.onDisk = true;
+        };
+        //into mem, off disk
+        DeviceDriverHardDrive.prototype.rollIn = function (PCB) {
+            var PID = PCB.pID.toString();
+            var name = 'PID' + PID;
+            var dirTSB = this.getFile(name);
+            var TSB = this.getTSB(dirTSB);
+            if (!PCB.onDisk) {
+                _StdOut.putText(PCB.pID + 'is already in memory');
+            }
+            else {
+                var prog = this.readData(TSB, true);
+                var program = prog.split(',');
+                //this.clearData(TSB);
+                _MemManager.load(PCB, program);
             }
         };
         return DeviceDriverHardDrive;

@@ -87,14 +87,14 @@ var TSOS;
                         this.sysCall();
                         break;
                     default:
-                        this.sysBreak();
+                        this.currPCB.State = 'Terminated';
                         break;
                 }
-                this.PC = this.PC % 256;
                 //Keep PCB up to date
                 this.updatePCB();
                 TSOS.Control.updateMemTable();
-                if (!_cpuScheduler.readyQueue.isEmpty() && _cpuScheduler.readyQueue.q.length != 1) {
+                this.PC = this.PC % 256;
+                if (!_cpuScheduler.readyQueue.isEmpty()) {
                     _cpuScheduler.counter();
                 }
             }
@@ -217,10 +217,12 @@ var TSOS;
             _MemManager.clearPart(this.currPCB.pID);
             //Push PID to executed array
             _MemManager.executed.push(this.currPCB.pID);
-            this.clearPCB();
-            //ClearMem
             //Array of Executed programs
-            this.isExecuting = false;
+            if (_cpuScheduler.readyQueue.isEmpty()) {
+                this.isExecuting = false;
+            }
+            _StdOut.putText('Process ' + this.currPCB.pID + ' completed.');
+            _cpuScheduler.contextSwitch();
         };
         Cpu.prototype.clearPCB = function () {
             this.currPCB = null;

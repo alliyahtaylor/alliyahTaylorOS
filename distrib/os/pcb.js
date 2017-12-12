@@ -1,7 +1,7 @@
 var TSOS;
 (function (TSOS) {
     var Pcb = /** @class */ (function () {
-        function Pcb(pID, PC, Acc, Xreg, Yreg, Zflag, Base, Limit, State) {
+        function Pcb(pID, PC, Acc, Xreg, Yreg, Zflag, Base, Limit, State, priority, onDisk) {
             if (pID === void 0) { pID = 0; }
             if (PC === void 0) { PC = 0; }
             if (Acc === void 0) { Acc = 0; }
@@ -11,6 +11,8 @@ var TSOS;
             if (Base === void 0) { Base = 0; }
             if (Limit === void 0) { Limit = 0; }
             if (State === void 0) { State = ''; }
+            if (priority === void 0) { priority = 0; }
+            if (onDisk === void 0) { onDisk = false; }
             this.pID = pID;
             this.PC = PC;
             this.Acc = Acc;
@@ -20,6 +22,8 @@ var TSOS;
             this.Base = Base;
             this.Limit = Limit;
             this.State = State;
+            this.priority = priority;
+            this.onDisk = onDisk;
         }
         Pcb.prototype.init = function (pID) {
             this.pID = pID;

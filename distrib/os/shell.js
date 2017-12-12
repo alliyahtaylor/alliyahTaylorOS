@@ -85,6 +85,10 @@ var TSOS;
             this.commandList[this.commandList.length] = sc;
             sc = new TSOS.ShellCommand(this.shellls, "ls", "- Lists all files on the disk.");
             this.commandList[this.commandList.length] = sc;
+            sc = new TSOS.ShellCommand(this.shellGetSchedule, "getschedule", "- returns the currently selected scheduling algorithm.");
+            this.commandList[this.commandList.length] = sc;
+            sc = new TSOS.ShellCommand(this.shellSetSchedule, "setschedule", "- rr, fcfs, priority. Changes the scheduling algorithm.");
+            this.commandList[this.commandList.length] = sc;
             //
             // Display the initial prompt.
             this.putPrompt();
@@ -344,52 +348,31 @@ var TSOS;
         Shell.prototype.shellBSOD = function (args) {
             _Kernel.krnTrapError("Test Error, Stand By For Security Drill.");
         };
+        //This was a horrible clusterfuck, so hopefully we can fix that.
         Shell.prototype.shellLoad = function (args) {
-            //Get the user input from the user program box
-            var userProg = document.getElementById("taProgramInput").value;
-            //separate input into program array
-            var progString = '';
+            //get the user input from the input box
+            var userProg = document.getElementById('taProgramInput').value;
+            //split it into a program array.
             var progArr = userProg.split(' ');
-            for (var i = 0; i < progArr.length; i++) {
-                progString += progArr[i];
-            }
-            //make sure there's actually a user input
-            if (progArr.length < 1) {
-                _StdOut.putText("Please input a program.");
-                //Make sure the program doesn't go over max length
-            }
-            else if (progArr.length > 256) {
-                //Error if program is too large for memory.
-                _StdOut.putText("Error. Program too large.");
-            }
-            else {
-                //set up a regular expression to test the user input against
-                var hexTest = new RegExp(/^[A-Fa-f0-9\s]+$/);
-                //see if user input matches the regular expression
-                if (userProg.match(hexTest)) {
-                    //At this point we know that the program exists, only has hex digits, and isn't too big
-                    //So check if there is space in memory
-                    if (_MemManager.availPart() != null) {
-                        var PID = _MemManager.PIDList[_MemManager.PIDList.length - 1];
-                        var newPCB = new TSOS.Pcb();
-                        newPCB.init(PID);
-                        _PCBArr.push(newPCB);
-                        _MemManager.load(newPCB, progArr);
-                        _StdOut.putText("Loaded PID " + PID);
-                        //Increment the PID so that the next program has a different PID
-                        _MemManager.incPID();
-                        //Update the mem table with the loaded program.
-                        TSOS.Control.updateMemTable();
-                        //Add the PCB to the ready queue. Why weren't you doing this already?
-                        _cpuScheduler.loadQueue();
+            if (_MemManager.validateProgram(progArr, userProg)) {
+                if (_MemManager.availPart() != null) {
+                    var PID = _MemManager.PIDList[_MemManager.PIDList.length - 1];
+                    var newPCB = new TSOS.Pcb();
+                    newPCB.init(PID);
+                    if (_cpuScheduler.priority) {
+                        var priority;
+                        if (args.length === 0) {
+                            newPCB.priority = 32;
+                        }
+                        else {
+                            newPCB.priority = parseInt(args[0]);
+                        }
                     }
-                    else {
-                        _StdOut.putText('No memory available. Please clear memory');
-                    }
+                    _PCBArr.push(newPCB);
+                    _MemManager.load(newPCB, progArr);
                 }
                 else {
-                    //Error if program has non-hex digits.
-                    _StdOut.putText('Invalid program, non-hex digits.');
+                    _StdOut.putText('No memory available. Please clear the memory.');
                 }
             }
         };
@@ -536,7 +519,43 @@ var TSOS;
             }
         };
         Shell.prototype.shellls = function () {
-            _krnHardDriveDriver.listFiles();
+            if (!_krnHardDriveDriver.formatted) {
+                _StdOut.putText('The hard drive must be formatted first.');
+            }
+            else {
+                _krnHardDriveDriver.listFiles();
+            }
+        };
+        Shell.prototype.shellSetSchedule = function (args) {
+            if (args.length < 1) {
+                _StdOut.putText('Please include which algorithm you would like to set (rr, fcfs, priority)');
+            }
+            else if (args[0].toLowerCase() === 'rr') {
+                _cpuScheduler.RR = true;
+            }
+            else if (args[0].toLowerCase() === 'fcfs') {
+                _cpuScheduler.fcfs = true;
+            }
+            else if (args[0].toLowerCase() === 'priority') {
+                _cpuScheduler.priority = true;
+            }
+            else {
+                _StdOut.putText('Algorithm may only be rr, fcfs, or priority.');
+            }
+        };
+        Shell.prototype.shellGetSchedule = function () {
+            if (_cpuScheduler.RR) {
+                _StdOut.putText('Round Robin Scheduling Active.');
+            }
+            else if (_cpuScheduler.fcfs) {
+                _StdOut.putText('First Come, First Serve Scheduling Active.');
+            }
+            else if (_cpuScheduler.priority) {
+                _StdOut.putText('Priority Scheduling Active.');
+            }
+            else {
+                _StdOut.putText('No Algorithm selected. Defaulting to Round Robin Scheduling.');
+            }
         };
         return Shell;
     }());

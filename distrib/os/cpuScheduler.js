@@ -3,13 +3,19 @@
 var TSOS;
 (function (TSOS) {
     var cpuScheduler = /** @class */ (function () {
-        function cpuScheduler(quantum, count, readyQueue) {
+        function cpuScheduler(quantum, count, readyQueue, RR, fcfs, priority) {
             if (quantum === void 0) { quantum = 6; }
             if (count === void 0) { count = 0; }
             if (readyQueue === void 0) { readyQueue = new TSOS.Queue(); }
+            if (RR === void 0) { RR = false; }
+            if (fcfs === void 0) { fcfs = false; }
+            if (priority === void 0) { priority = false; }
             this.quantum = quantum;
             this.count = count;
             this.readyQueue = readyQueue;
+            this.RR = RR;
+            this.fcfs = fcfs;
+            this.priority = priority;
             this.readyQueue = readyQueue;
         }
         cpuScheduler.prototype.addQueue = function (PCB) {
@@ -21,11 +27,16 @@ var TSOS;
             }
             else {
                 if (_CPU.currPCB.State != 'Terminated') {
+                    _CPU.updatePCB();
                     _CPU.currPCB.State = 'Ready';
                     this.readyQueue.enqueue(_CPU.currPCB);
                 }
                 _CPU.IR = ' ';
+                var last = _CPU.currPCB;
                 var next = this.readyQueue.dequeue();
+                if (next.onDisk) {
+                    this.swap(last, next);
+                }
                 _CPU.currPCB = next;
                 _CPU.currPCB.State = 'Running';
                 _CPU.loadFromPCB();
@@ -41,6 +52,21 @@ var TSOS;
             _CPU.currPCB.State = 'Running';
         };
         cpuScheduler.prototype.counter = function () {
+            if (this.RR) {
+                this.quantum = 6;
+            }
+            else if (this.fcfs) {
+                //cheating with a huge quantum
+                this.quantum = 100000;
+            }
+            else if (this.priority) {
+                this.sortQueue();
+                this.quantum = 100000;
+            }
+            else {
+                this.quantum = 6; //I just wanna make sure cheating above doesn't mess things up later
+                this.RR = true;
+            }
             if (this.count < this.quantum) {
                 this.count++;
             }
@@ -48,6 +74,37 @@ var TSOS;
                 this.count = 0;
                 _KernelInterruptQueue.enqueue(new TSOS.Interrupt(CON_SWITCH_IRQ, 'Scheduling Event'));
             }
+        };
+        //for Priority
+        cpuScheduler.prototype.sortQueue = function () {
+            var PCBs = [];
+            var priorities = [];
+            var length = this.readyQueue.getSize();
+            for (var i = 0; i < length; i++) {
+                var PCB = this.readyQueue.q[i];
+                PCBs.push(PCB);
+                priorities.push(PCB.priority);
+            }
+            var sorted = [];
+            priorities.sort();
+            for (i = 0; i < length; i++) {
+                var priority = priorities[i];
+                for (var j = 0; j < PCBs.length; j++) {
+                    if (PCBs[j].priority == priority) {
+                        sorted.push(PCBs.splice(j, 1));
+                    }
+                }
+            }
+            for (var i = 0; i < sorted.length; i++) {
+                this.readyQueue.enqueue(sorted[i]);
+            }
+        };
+        cpuScheduler.prototype.swap = function (MemPCB, HDDPCB) {
+            var program = _MemManager.getProgram(MemPCB);
+            if (MemPCB.State !== 'Terminated') {
+                _krnHardDriveDriver.rollOut(program, _MemManager.getPart(MemPCB), MemPCB);
+            }
+            _krnHardDriveDriver.rollIn(HDDPCB);
         };
         return cpuScheduler;
     }());

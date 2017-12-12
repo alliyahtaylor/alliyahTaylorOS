@@ -8,7 +8,9 @@ module TSOS{
                    public Zflag = 0,
                    public Base = 0,
                    public Limit = 0,
-                   public State = ''
+                   public State = '',
+                   public priority = 0,
+                   public onDisk = false
     ){}
 
         public init(pID){
