@@ -49,6 +49,7 @@ var TSOS;
                 }
             }
             if (this.priority) {
+                //Sort the queue here to make sure it stays in order
                 this.sortQueue();
             }
             _CPU.currPCB = this.readyQueue.dequeue();
@@ -77,19 +78,21 @@ var TSOS;
                 _KernelInterruptQueue.enqueue(new TSOS.Interrupt(CON_SWITCH_IRQ, 'Scheduling Event'));
             }
         };
-        //for Priority
+        //for Priority Scheduling
         cpuScheduler.prototype.sortQueue = function () {
-            _StdOut.putText('test');
             var PCBs = [];
             var priorities = [];
             var length = this.readyQueue.getSize();
+            //get pcbs from queue
             for (var i = 0; i < length; i++) {
                 var PCB = this.readyQueue.dequeue();
                 PCBs.push(PCB);
                 priorities.push(PCB.priority);
             }
             var sorted = [];
+            //sort the priorities separately because it's easy
             priorities = priorities.sort();
+            //push PCBs into an array in priority order
             for (var i = 0; i < length; i++) {
                 var priority = priorities[i];
                 for (var j = 0; j < PCBs.length; j++) {
@@ -98,10 +101,12 @@ var TSOS;
                     }
                 }
             }
+            //load sorted PCBs back into queueu
             for (var i = 0; i < sorted.length; i++) {
                 this.readyQueue.enqueue(sorted[i][0]);
             }
         };
+        //Rollin/Rollout
         cpuScheduler.prototype.swap = function (MemPCB, HDDPCB) {
             var program = _MemManager.getProgram(MemPCB);
             if (MemPCB.State !== 'Terminated') {

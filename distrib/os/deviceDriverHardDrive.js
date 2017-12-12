@@ -205,7 +205,7 @@ var TSOS;
                 return false;
             }
         };
-        //set something in use
+        //set TSB in use
         DeviceDriverHardDrive.prototype.setUse = function (tsb, status) {
             var block = _HardDrive.read(tsb);
             block = block.slice(1, block.length - 1);
@@ -241,6 +241,7 @@ var TSOS;
                 return '';
             }
         };
+        //See if name exists in the idrectory
         DeviceDriverHardDrive.prototype.checkName = function (name, tsb) {
             var data = this.getData(tsb);
             if (data.localeCompare(name) === 0) {
@@ -287,6 +288,7 @@ var TSOS;
                 this.setData(newTSB, leftovers, size - limit, isProgram);
             }
         };
+        //Delete data  from a file
         DeviceDriverHardDrive.prototype.clearData = function (tsb) {
             this.setUse(tsb, false);
             if (this.getTSB(tsb) === "~~~") {
@@ -297,6 +299,7 @@ var TSOS;
             }
             TSOS.Control.updateHardDriveTBL();
         };
+        //read the data from a file
         DeviceDriverHardDrive.prototype.getData = function (tsb) {
             var data = _HardDrive.read(tsb);
             var str = '';
@@ -309,11 +312,13 @@ var TSOS;
             }
             return str;
         };
+        //Read Hex data from a file
         DeviceDriverHardDrive.prototype.getHexData = function (tsb) {
             var data = _HardDrive.read(tsb);
             data = data.substring(4, data.length);
             return data;
         };
+        //list all files that currently reside in the disk
         DeviceDriverHardDrive.prototype.listFiles = function () {
             var tsb = '';
             var t = 0;

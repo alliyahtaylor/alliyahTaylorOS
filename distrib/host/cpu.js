@@ -218,11 +218,11 @@ var TSOS;
             //Push PID to executed array
             _MemManager.executed.push(this.currPCB.pID);
             //Array of Executed programs
+            //This is just gonna let us know that we're done with this a couple million times
+            _StdOut.putText('Process ' + this.currPCB.pID + ' completed.');
             if (_cpuScheduler.readyQueue.isEmpty()) {
                 this.isExecuting = false;
             }
-            //This is just gonna let us know that we're done with this a couple million times
-            _StdOut.putText('Process ' + this.currPCB.pID + ' completed.');
             _cpuScheduler.contextSwitch();
         };
         Cpu.prototype.clearPCB = function () {

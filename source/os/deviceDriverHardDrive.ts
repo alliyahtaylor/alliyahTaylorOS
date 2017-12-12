@@ -196,7 +196,7 @@ module TSOS{
                 return false;
             }
         }
-        //set something in use
+        //set TSB in use
         public setUse(tsb, status){
             var block: string = _HardDrive.read(tsb);
             block = block.slice(1, block.length - 1);
@@ -230,6 +230,7 @@ module TSOS{
                 return '';
             }
         }
+        //See if name exists in the idrectory
         public checkName(name, tsb){
             var data = this.getData(tsb);
             if (data.localeCompare(name) === 0){
@@ -273,6 +274,7 @@ module TSOS{
                 this.setData(newTSB, leftovers, size-limit, isProgram);
             }
         }
+        //Delete data  from a file
         public clearData(tsb){
             this.setUse(tsb, false);
             if(this.getTSB(tsb) === "~~~"){
@@ -284,6 +286,7 @@ module TSOS{
             Control.updateHardDriveTBL()
         }
 
+        //read the data from a file
         public getData(tsb){
             var data = _HardDrive.read(tsb);
             var str = '';
@@ -296,11 +299,15 @@ module TSOS{
             }
             return str;
         }
+
+        //Read Hex data from a file
         public getHexData(tsb){
             var data = _HardDrive.read(tsb);
             data = data.substring(4, data.length);
             return data;
         }
+
+        //list all files that currently reside in the disk
         public listFiles(){
             var tsb = '';
             var t = 0;
