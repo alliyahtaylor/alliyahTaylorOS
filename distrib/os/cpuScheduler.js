@@ -48,6 +48,9 @@ var TSOS;
                     this.readyQueue.enqueue(_PCBArr[i]);
                 }
             }
+            if (this.priority) {
+                this.sortQueue();
+            }
             _CPU.currPCB = this.readyQueue.dequeue();
             _CPU.currPCB.State = 'Running';
         };
@@ -60,7 +63,6 @@ var TSOS;
                 this.quantum = 100000;
             }
             else if (this.priority) {
-                this.sortQueue();
                 this.quantum = 100000;
             }
             else {
@@ -77,17 +79,18 @@ var TSOS;
         };
         //for Priority
         cpuScheduler.prototype.sortQueue = function () {
+            _StdOut.putText('test');
             var PCBs = [];
             var priorities = [];
             var length = this.readyQueue.getSize();
             for (var i = 0; i < length; i++) {
-                var PCB = this.readyQueue.q[i];
+                var PCB = this.readyQueue.dequeue();
                 PCBs.push(PCB);
                 priorities.push(PCB.priority);
             }
             var sorted = [];
-            priorities.sort();
-            for (i = 0; i < length; i++) {
+            priorities = priorities.sort();
+            for (var i = 0; i < length; i++) {
                 var priority = priorities[i];
                 for (var j = 0; j < PCBs.length; j++) {
                     if (PCBs[j].priority == priority) {
@@ -96,7 +99,7 @@ var TSOS;
                 }
             }
             for (var i = 0; i < sorted.length; i++) {
-                this.readyQueue.enqueue(sorted[i]);
+                this.readyQueue.enqueue(sorted[i][0]);
             }
         };
         cpuScheduler.prototype.swap = function (MemPCB, HDDPCB) {

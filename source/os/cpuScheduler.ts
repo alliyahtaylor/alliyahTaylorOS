@@ -41,6 +41,9 @@ module TSOS{
                 if(_PCBArr[i].State != 'Terminated'){
                     this.readyQueue.enqueue(_PCBArr[i]);}
             }
+            if(this.priority){
+                this.sortQueue();
+            }
             _CPU.currPCB = this.readyQueue.dequeue();
             _CPU.currPCB.State = 'Running';
         }
@@ -52,7 +55,6 @@ module TSOS{
                 //cheating with a huge quantum
                 this.quantum = 100000;
             }else if(this.priority){
-                this.sortQueue();
                 this.quantum = 100000;
             }else{
                 this.quantum = 6; //I just wanna make sure cheating above doesn't mess things up later
@@ -67,19 +69,20 @@ module TSOS{
         }
         //for Priority
         public sortQueue(){
+            _StdOut.putText('test');
             var PCBs = [];
             var priorities = [];
             var length = this.readyQueue.getSize();
 
             for(var i = 0; i < length; i++){
-                var PCB = this.readyQueue.q[i];
+                var PCB = this.readyQueue.dequeue();
                 PCBs.push(PCB);
                 priorities.push(PCB.priority);
             }
             var sorted = [];
-            priorities.sort();
+            priorities = priorities.sort();
 
-            for (i = 0; i < length; i++){
+            for (var i = 0; i < length; i++){
                 var priority = priorities[i];
                 for(var j = 0; j < PCBs.length; j++){
                     if(PCBs[j].priority == priority){
@@ -88,7 +91,7 @@ module TSOS{
                 }
             }
             for (var i=0; i < sorted.length; i++){
-                this.readyQueue.enqueue(sorted[i]);
+                this.readyQueue.enqueue(sorted[i][0]);
             }
         }
         public swap(MemPCB, HDDPCB){

@@ -10,9 +10,9 @@
 //
 // Global CONSTANTS (TypeScript 1.5 introduced const. Very cool.)
 //
-var APP_NAME = "GenesOS"; // Because I've seen Wrath of Khan 2 times in the past week.
+var APP_NAME = "VeQ ngoq"; // Because I've seen Wrath of Khan 2 times in the past week.
 // It's not LCARS because... It's not LCARS, leave me alone.
-var APP_VERSION = "0.01 - USS Enterprise Edition"; // Enterprise models increment so this is definitely valid.
+var APP_VERSION = "Honor Edition"; // Enterprise models increment so this is definitely valid.
 var CPU_CLOCK_INTERVAL = 100; // This is in ms (milliseconds) so 1000 = 1 second.
 var TIMER_IRQ = 0; // Pages 23 (timer), 9 (interrupts), and 561 (interrupt priority).
 // NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.
