@@ -57,6 +57,7 @@ var TSOS;
                 }
             }
             this.formatted = true;
+            TSOS.Control.updateHardDriveTBL();
             _StdOut.putText('Format Successful.');
         };
         //Find a free directory block
@@ -135,6 +136,7 @@ var TSOS;
             else {
                 _StdOut.putText('No free file space available.');
             }
+            TSOS.Control.updateHardDriveTBL();
             _StdOut.putText('File ' + name + ' successfully created');
         };
         //Write File
@@ -151,6 +153,7 @@ var TSOS;
                 }
                 this.setData(fileTSB, data, size, false);
             }
+            TSOS.Control.updateHardDriveTBL();
         };
         //Read File
         DeviceDriverHardDrive.prototype.readFile = function (name) {
@@ -191,6 +194,7 @@ var TSOS;
                 this.setUse(dirTSB, false);
                 _StdOut.putText('File deleted.');
             }
+            TSOS.Control.updateHardDriveTBL();
         };
         //Check if something is in use
         DeviceDriverHardDrive.prototype.inUse = function (tsb) {
@@ -291,6 +295,7 @@ var TSOS;
                 var nextTSB = this.getTSB(tsb);
                 this.clearData(nextTSB);
             }
+            TSOS.Control.updateHardDriveTBL();
         };
         DeviceDriverHardDrive.prototype.getData = function (tsb) {
             var data = _HardDrive.read(tsb);

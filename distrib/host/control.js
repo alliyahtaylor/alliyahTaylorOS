@@ -164,6 +164,22 @@ var TSOS;
             document.getElementById("earthTimeLabel").innerHTML = "Earth Time: " + earthTime.toLocaleDateString("en-US", options);
             document.getElementById("statusLabel").innerHTML = "Current Status: " + _Status;
         };
+        Control.updateHardDriveTBL = function () {
+            var table = '';
+            var data = '';
+            var tsb = '';
+            var display = document.getElementById("hardDriveTBLBod");
+            for (var t = 0; t < TRACKS; t++) {
+                for (var b = 0; b < BLOCKS; b++) {
+                    for (var s = 0; s < BLOCKS; s++) {
+                        tsb = '' + t + s + b;
+                        data = _HardDrive.read(tsb);
+                        table += "<tr><td>" + tsb + "</td><td>" + data + "</td>";
+                    }
+                }
+            }
+            display.innerHTML = table;
+        };
         return Control;
     }());
     TSOS.Control = Control;

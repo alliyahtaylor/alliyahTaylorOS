@@ -46,6 +46,7 @@ module TSOS{
                 }
             }
             this.formatted = true;
+            Control.updateHardDriveTBL();
             _StdOut.putText('Format Successful.');
         }
 
@@ -125,6 +126,7 @@ module TSOS{
             }else{
                 _StdOut.putText('No free file space available.');
             }
+            Control.updateHardDriveTBL();
             _StdOut.putText('File ' + name + ' successfully created');
         }
 
@@ -142,8 +144,8 @@ module TSOS{
                     this.clearData(fileTSB);
                 }
                 this.setData(fileTSB, data, size, false);
-
             }
+            Control.updateHardDriveTBL()
         }
 
         //Read File
@@ -182,6 +184,7 @@ module TSOS{
                 this.setUse(dirTSB, false);
                 _StdOut.putText('File deleted.');
             }
+            Control.updateHardDriveTBL();
         }
 
 
@@ -277,9 +280,9 @@ module TSOS{
             }else{
                 var nextTSB = this.getTSB(tsb);
                 this.clearData(nextTSB);
+            }
+            Control.updateHardDriveTBL()
         }
-
-    }
 
         public getData(tsb){
             var data = _HardDrive.read(tsb);

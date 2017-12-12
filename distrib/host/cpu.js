@@ -221,6 +221,7 @@ var TSOS;
             if (_cpuScheduler.readyQueue.isEmpty()) {
                 this.isExecuting = false;
             }
+            //This is just gonna let us know that we're done with this a couple million times
             _StdOut.putText('Process ' + this.currPCB.pID + ' completed.');
             _cpuScheduler.contextSwitch();
         };
