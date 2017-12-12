@@ -387,7 +387,12 @@ var TSOS;
             }
         };
         Shell.prototype.shellClearMem = function () {
-            _MemManager.eraseAll();
+            if (_CPU.isExecuting) {
+                _StdOut.putText('You may not clear memory while programs are executing.');
+            }
+            else {
+                _MemManager.eraseAll();
+            }
         };
         Shell.prototype.shellRunAll = function () {
             var length = _PCBArr.length;

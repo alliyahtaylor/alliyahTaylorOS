@@ -472,7 +472,10 @@ module TSOS {
             }
         }
         public shellClearMem(){
-            _MemManager.eraseAll();
+            if (_CPU.isExecuting){
+                _StdOut.putText('You may not clear memory while programs are executing.')
+            }else{
+            _MemManager.eraseAll();}
         }
 
         public shellRunAll(){
